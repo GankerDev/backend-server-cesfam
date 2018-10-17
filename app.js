@@ -2,6 +2,10 @@
 var express = require('express');
 var mongoose = require('mongoose');
 
+// Importar rutas
+var appRoutes = require('./routes/app');
+var usuarioRoutes = require('./routes/usuario');
+
 //Inicializar varriables
 var app = express();
 
@@ -13,12 +17,9 @@ mongoose.connection.openUri('mongodb://localhost:27017/cesfamDB', (err, res) => 
 });
 
 // Rutas
-app.get('/', (req, res, next) => {
-    res.status(200).json({
-        ok: true,
-        mensaje: 'Petición realizada correstamente'
-    });
-});
+app.use('/usuario', usuarioRoutes);
+app.use('/', appRoutes);
+
 
 // Escuchar peticiones
 app.listen(3000, () => {
