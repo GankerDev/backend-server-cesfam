@@ -1,103 +1,94 @@
 var express = require('express');
-var bcrypt = require('bcryptjs');
 
 var mdAutenticacion = require('../middlewares/autenticacion');
 
 var app = express();
 
-var Usuario = require('../models/usuario');
+var TipoPermiso = require('../models/tipoPermisos');
 
 // ==============================================
-//  Obtener todos los usuarios
+//  Obtener todos los tipos de permisos
 // ==============================================
 
 app.get('/', (req, res, next) => {
 
-    Usuario.find({}, 'nombre email img role')
+    TipoPermiso.find({})
         .exec(
-            (err, usuarios) => {
+            (err, tipoPermisos) => {
                 if (err) {
                     return res.status(500).json({
                         ok: false,
-                        mensaje: 'Error cargando usuario',
+                        mensaje: 'Error cargando tipo de permiso',
                         errors: err
                     });
                 }
                 res.status(200).json({
                     ok: true,
-                    usuarios
+                    tipoPermisos: tipoPermisos
                 });
 
             })
 });
 
 // ==============================================
-//  Crear nuevo usuario
+//  Crear nuevo tipo de permiso
 // ==============================================
 app.post('/', mdAutenticacion.verificaToken, (req, res) => {
 
     var body = req.body;
 
-    var usuario = new Usuario({
-        nombre: body.nombre,
-        email: body.email,
-        password: bcrypt.hashSync(body.password, 10),
-        img: body.img,
-        role: body.role
+    var tipoPermiso = new TipoPermiso({
+        nombre: body.nombre
     });
 
-    usuario.save((err, usuarioGuardado) => {
+    tipoPermiso.save((err, tipoPermisoGuardado) => {
         if (err) {
             return res.status(400).json({
                 ok: false,
-                mensaje: 'Error al crear usuario',
+                mensaje: 'Error al crear tipo de permiso',
                 errors: err
             });
         }
         res.status(201).json({
             ok: true,
-            usuario: usuarioGuardado
+            tipoPermiso: tipoPermisoGuardado
         });
     });
 
 });
 
 // ==============================================
-//  Actualizar usuario
+//  Actualizar tipo de permiso
 // ==============================================
-app.put('/:id', mdAutenticacion.verificaToken, (req, res) => {
+app.put('/:id', (req, res) => {
 
     var id = req.params.id;
     var body = req.body;
 
-    Usuario.findById(id, (err, usuario) => {
+    TipoPermiso.findById(id, (err, tipoPermiso) => {
 
         if (err) {
-            return res.status(500).json({
+            return res.status(400).json({
                 ok: false,
-                mensaje: 'El usuario con el id ' + id + ' no existe',
-                errors: { message: 'No existe un usuario con ese ID' }
+                mensaje: 'El tipo de permiso con el id ' + id + ' no existe',
+                errors: { message: 'No existe un tipo de permiso con ese ID' }
             });
         }
 
-        usuario.nombre = body.nombre;
-        usuario.email = body.email;
-        usuario.role = body.role;
+        tipoPermiso.nombre = body.nombre;
 
-        usuario.save((err, usuarioGuardado) => {
+        tipoPermiso.save((err, tipoPermisoGuardado) => {
             if (err) {
-                return res.status(400).json({
+                return res.status(500).json({
                     ok: false,
-                    mensaje: 'Error al actualizar el usuario',
+                    mensaje: 'Error al actualizar el tipo de permiso',
                     errors: err
                 });
             }
 
-            usuarioGuardado.password = ':)';
-
             res.status(200).json({
                 ok: true,
-                usuario: usuarioGuardado
+                tipoPermiso: tipoPermisoGuardado
             });
         });
 
@@ -106,31 +97,31 @@ app.put('/:id', mdAutenticacion.verificaToken, (req, res) => {
 });
 
 // ==============================================
-//  Borrar un usuario por el id
+//  Borrar un tipo de permiso por el id
 // ==============================================
 app.delete('/:id', mdAutenticacion.verificaToken, (req, res) => {
     var id = req.params.id;
 
-    Usuario.findByIdAndRemove(id, (err, usuarioBorrado) => {
+    TipoPermiso.findByIdAndRemove(id, (err, tipoPermisoBorrado) => {
         if (err) {
             return res.status(500).json({
                 ok: false,
-                mensaje: 'Error al borrar usuario',
+                mensaje: 'Error al borrar tipo de permiso',
                 errors: err
             });
         }
 
-        if (!usuarioBorrado) {
+        if (!tipoPermisoBorrado) {
             return res.status(400).json({
                 ok: false,
-                mensaje: 'No existe un usuario con ese id',
-                errors: { message: 'No existe un usuario con ese id' }
+                mensaje: 'No existe un tipo de permiso con ese id',
+                errors: { message: 'No existe un tipo de permiso con ese id' }
             });
         }
 
         res.status(200).json({
             ok: true,
-            usuario: usuarioBorrado
+            tipoPermiso: tipoPermisoBorrado
         });
     });
 });

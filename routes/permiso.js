@@ -1,103 +1,108 @@
 var express = require('express');
-var bcrypt = require('bcryptjs');
 
 var mdAutenticacion = require('../middlewares/autenticacion');
 
 var app = express();
 
-var Usuario = require('../models/usuario');
+var Permiso = require('../models/permiso');
 
 // ==============================================
-//  Obtener todos los usuarios
+//  Obtener todos los permisos
 // ==============================================
 
 app.get('/', (req, res, next) => {
 
-    Usuario.find({}, 'nombre email img role')
+    Permiso.find({})
         .exec(
-            (err, usuarios) => {
+            (err, permisos) => {
                 if (err) {
                     return res.status(500).json({
                         ok: false,
-                        mensaje: 'Error cargando usuario',
+                        mensaje: 'Error cargando permisos',
                         errors: err
                     });
                 }
                 res.status(200).json({
                     ok: true,
-                    usuarios
+                    permisos
                 });
 
             })
 });
 
 // ==============================================
-//  Crear nuevo usuario
+//  Crear nuevo permiso
 // ==============================================
 app.post('/', mdAutenticacion.verificaToken, (req, res) => {
 
     var body = req.body;
 
-    var usuario = new Usuario({
-        nombre: body.nombre,
-        email: body.email,
-        password: bcrypt.hashSync(body.password, 10),
-        img: body.img,
-        role: body.role
+    var permiso = new Permiso({
+        fecha: body.fecha,
+        dias_fijos: body.dias_fijos,
+        tiempo_permiso: body.tiempo_permiso,
+        dias_restantes: body.dias_restantes,
+        dias_adm_fijos: body.dias_adm_fijos,
+        dias_adm_acumulados: body.dias_adm_acumulados,
+        usuario: req.usuario._id,
+        tipoPermisos: body.tipoPermisos
     });
 
-    usuario.save((err, usuarioGuardado) => {
+    permiso.save((err, permisoGuardado) => {
         if (err) {
             return res.status(400).json({
                 ok: false,
-                mensaje: 'Error al crear usuario',
+                mensaje: 'Error al crear permiso',
                 errors: err
             });
         }
         res.status(201).json({
             ok: true,
-            usuario: usuarioGuardado
+            permiso: permisoGuardado
         });
     });
 
 });
 
 // ==============================================
-//  Actualizar usuario
+//  Actualizar permiso
 // ==============================================
 app.put('/:id', mdAutenticacion.verificaToken, (req, res) => {
 
     var id = req.params.id;
     var body = req.body;
 
-    Usuario.findById(id, (err, usuario) => {
+    Permiso.findById(id, (err, permiso) => {
 
         if (err) {
             return res.status(500).json({
                 ok: false,
-                mensaje: 'El usuario con el id ' + id + ' no existe',
-                errors: { message: 'No existe un usuario con ese ID' }
+                mensaje: 'El permiso con el id ' + id + ' no existe',
+                errors: { message: 'No existe un permiso con ese ID' }
             });
         }
 
-        usuario.nombre = body.nombre;
-        usuario.email = body.email;
-        usuario.role = body.role;
+        permiso.fecha = body.fecha;
+        permiso.dias_fijos = body.dias_fijos;
+        permiso.tiempo_permiso = body.tiempo_permiso;
+        permiso.dias_restantes = body.dias_restantes;
+        permiso.dias_adm_fijos = body.dias_adm_fijos;
+        permiso.dias_adm_acumulados = body.dias_adm_acumulados;
+        permiso.usuario = req.usuario._id;
+        permiso.tipoPermisos = body.tipoPermisos
 
-        usuario.save((err, usuarioGuardado) => {
+        permiso.save((err, permisoGuardado) => {
             if (err) {
                 return res.status(400).json({
                     ok: false,
-                    mensaje: 'Error al actualizar el usuario',
+                    mensaje: 'Error al actualizar el permiso',
                     errors: err
                 });
             }
 
-            usuarioGuardado.password = ':)';
-
             res.status(200).json({
                 ok: true,
-                usuario: usuarioGuardado
+                permiso: permisoGuardado
             });
         });
 
@@ -106,31 +111,31 @@ app.put('/:id', mdAutenticacion.verificaToken, (req, res) => {
 });
 
 // ==============================================
-//  Borrar un usuario por el id
+//  Borrar un permiso por el id
 // ==============================================
 app.delete('/:id', mdAutenticacion.verificaToken, (req, res) => {
     var id = req.params.id;
 
-    Usuario.findByIdAndRemove(id, (err, usuarioBorrado) => {
+    Permiso.findByIdAndRemove(id, (err, permisoBorrado) => {
         if (err) {
             return res.status(500).json({
                 ok: false,
-                mensaje: 'Error al borrar usuario',
+                mensaje: 'Error al borrar permiso',
                 errors: err
             });
         }
 
-        if (!usuarioBorrado) {
+        if (!permisoBorrado) {
             return res.status(400).json({
                 ok: false,
-                mensaje: 'No existe un usuario con ese id',
-                errors: { message: 'No existe un usuario con ese id' }
+                mensaje: 'No existe un permiso con ese id',
+                errors: { message: 'No existe un permiso con ese id' }
             });
         }
 
         res.status(200).json({
             ok: true,
-            usuario: usuarioBorrado
+            permiso: permisoBorrado
         });
     });
 });

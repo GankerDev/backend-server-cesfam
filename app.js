@@ -7,6 +7,10 @@ var bodyParser = require('body-parser');
 var appRoutes = require('./routes/app');
 var usuarioRoutes = require('./routes/usuario');
 var loginRoutes = require('./routes/login');
+var tipoPermisoRoutes = require('./routes/tipoPermisos');
+var permisoRoutes = require('./routes/permiso');
+var feriadoLegalRoutes = require('./routes/feriadoLegal');
+var licenciaMedicaRoutes = require('./routes/licenciaMedica');
 
 //Inicializar varriables
 var app = express();
@@ -24,6 +28,10 @@ mongoose.connection.openUri('mongodb://localhost:27017/cesfamDB', (err, res) => 
 });
 
 // Rutas
+app.use('/licencia-medica', licenciaMedicaRoutes);
+app.use('/feriado-legal', feriadoLegalRoutes);
+app.use('/permiso', permisoRoutes);
+app.use('/tipo-permiso', tipoPermisoRoutes);
 app.use('/usuario', usuarioRoutes);
 app.use('/login', loginRoutes);
 app.use('/', appRoutes);
