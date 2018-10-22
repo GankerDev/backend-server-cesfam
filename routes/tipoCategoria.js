@@ -4,100 +4,92 @@ var mdAutenticacion = require('../middlewares/autenticacion');
 
 var app = express();
 
-var FeriadoLegal = require('../models/feriadoLegal');
+var TipoCategoria = require('../models/tipoCategoria');
 
 // ==============================================
-//  Obtener todos los feriados legales
+//  Obtener todos los tipos de categorias
 // ==============================================
 
 app.get('/', (req, res, next) => {
 
-    FeriadoLegal.find({})
+    TipoCategoria.find({})
         .exec(
-            (err, feriadosLegales) => {
+            (err, tipoCategorias) => {
                 if (err) {
                     return res.status(500).json({
                         ok: false,
-                        mensaje: 'Error cargando feriado legal',
+                        mensaje: 'Error cargando tipo de categoria',
                         errors: err
                     });
                 }
                 res.status(200).json({
                     ok: true,
-                    feriadosLegales: feriadosLegales
+                    tipoCategorias: tipoCategorias
                 });
 
             })
 });
 
 // ==============================================
-//  Crear nuevo feriado legal
+//  Crear nuevo tipo de categoria
 // ==============================================
 app.post('/', mdAutenticacion.verificaToken, (req, res) => {
 
     var body = req.body;
 
-    var feriadoLegal = new FeriadoLegal({
-        dias_vacaciones_fijos: body.dias_vacaciones_fijos,
-        dias_vacaciones_acumulados: body.dias_vacaciones_acumulados,
-        fecha_inicio_vacaciones: body.fecha_inicio_vacaciones,
-        fecha_termino_vacaciones: body.fecha_termino_vacaciones,
-        dias_vacaciones_restantes: body.dias_vacaciones_restantes,
-        usuario: req.usuario._id
+    var tipoCategoria = new TipoCategoria({
+        nivel: body.nivel
     });
 
-    feriadoLegal.save((err, feriadoLegalGuardado) => {
+    tipoCategoria.save((err, tipoCategoriaGuardado) => {
         if (err) {
             return res.status(400).json({
                 ok: false,
-                mensaje: 'Error al crear feriado legal',
+                mensaje: 'Error al crear tipo de categoria',
                 errors: err
             });
         }
         res.status(201).json({
             ok: true,
-            feriadoLegal: feriadoLegalGuardado
+            tipoCategoria: tipoCategoriaGuardado
         });
     });
 
 });
 
 // ==============================================
-//  Actualizar feriado legal
+//  Actualizar tipo de categoria
 // ==============================================
 app.put('/:id', mdAutenticacion.verificaToken, (req, res) => {
 
     var id = req.params.id;
     var body = req.body;
 
-    FeriadoLegal.findById(id, (err, feriadoLegal) => {
+    TipoCategoria.findById(id, (err, tipoCategoria) => {
 
         if (err) {
             return res.status(400).json({
                 ok: false,
-                mensaje: 'El feriado legal con el id ' + id + ' no existe',
-                errors: { message: 'No existe un feriado legal con ese ID' }
+                mensaje: 'El tipo de categoria con el id ' + id + ' no existe',
+                errors: { message: 'No existe un tipo de categoria con ese ID' }
             });
         }
 
-        feriadoLegal.dias_vacaciones_fijos = body.dias_vacaciones_fijos,
-            feriadoLegal.dias_vacaciones_acumulados = body.dias_vacaciones_acumulados,
-            feriadoLegal.fecha_inicio_vacaciones = body.fecha_inicio_vacaciones,
-            feriadoLegal.fecha_termino_vacaciones = body.fecha_termino_vacaciones,
-            feriadoLegal.dias_vacaciones_restantes = body.dias_vacaciones_restantes
+        tipoCategoria.nivel = body.nivel;
+        usuario = req.usuario._id;
 
-        feriadoLegal.save((err, feriadoLegalGuardado) => {
+        tipoCategoria.save((err, tipoCategoriaGuardado) => {
             if (err) {
                 return res.status(500).json({
                     ok: false,
-                    mensaje: 'Error al actualizar el feriado legal',
+                    mensaje: 'Error al actualizar el tipo de categoria',
                     errors: err
                 });
             }
 
             res.status(200).json({
                 ok: true,
-                feriadoLegal: feriadoLegalGuardado
+                tipoCategoria: tipoCategoriaGuardado
             });
         });
 
@@ -106,31 +98,32 @@ app.put('/:id', mdAutenticacion.verificaToken, (req, res) => {
 });
 
 // ==============================================
-//  Borrar un Feriado legal por el id
+//  Borrar un tipo de categoria por el id
 // ==============================================
 app.delete('/:id', mdAutenticacion.verificaToken, (req, res) => {
+
     var id = req.params.id;
 
-    FeriadoLegal.findByIdAndRemove(id, (err, feriadoLegalBorrado) => {
+    TipoCategoria.findByIdAndRemove(id, (err, tipoCategoriaBorrado) => {
         if (err) {
             return res.status(500).json({
                 ok: false,
-                mensaje: 'Error al borrar feriado legal',
+                mensaje: 'Error al borrar tipo de categoria',
                 errors: err
             });
         }
 
-        if (!feriadoLegalBorrado) {
+        if (!tipoCategoriaBorrado) {
             return res.status(400).json({
                 ok: false,
-                mensaje: 'No existe un feriado legal con ese id',
-                errors: { message: 'No existe un feriado legal con ese id' }
+                mensaje: 'No existe un tipo de categoria con ese id',
+                errors: { message: 'No existe un tipo de categoria con ese id' }
             });
         }
 
         res.status(200).json({
             ok: true,
-            feriadoLegal: feriadoLegalBorrado
+            tipoCategoria: tipoCategoriaBorrado
         });
     });
 });

@@ -4,100 +4,96 @@ var mdAutenticacion = require('../middlewares/autenticacion');
 
 var app = express();
 
-var FeriadoLegal = require('../models/feriadoLegal');
+var Categoria = require('../models/categoria');
 
 // ==============================================
-//  Obtener todos los feriados legales
+//  Obtener todos las categorias
 // ==============================================
 
 app.get('/', (req, res, next) => {
 
-    FeriadoLegal.find({})
+    Categoria.find({})
         .exec(
-            (err, feriadosLegales) => {
+            (err, Categorias) => {
                 if (err) {
                     return res.status(500).json({
                         ok: false,
-                        mensaje: 'Error cargando feriado legal',
+                        mensaje: 'Error cargando categoria',
                         errors: err
                     });
                 }
                 res.status(200).json({
                     ok: true,
-                    feriadosLegales: feriadosLegales
+                    Categorias: Categorias
                 });
 
             })
 });
 
 // ==============================================
-//  Crear nuevo feriado legal
+//  Crear nueva categoria
 // ==============================================
 app.post('/', mdAutenticacion.verificaToken, (req, res) => {
 
     var body = req.body;
 
-    var feriadoLegal = new FeriadoLegal({
-        dias_vacaciones_fijos: body.dias_vacaciones_fijos,
-        dias_vacaciones_acumulados: body.dias_vacaciones_acumulados,
-        fecha_inicio_vacaciones: body.fecha_inicio_vacaciones,
-        fecha_termino_vacaciones: body.fecha_termino_vacaciones,
-        dias_vacaciones_restantes: body.dias_vacaciones_restantes,
-        usuario: req.usuario._id
+    var categoria = new Categoria({
+        nombre_cargo_funcionario: body.nombre_cargo_funcionario,
+        descripcion_cargo_funcionario: body.descripcion_cargo_funcionario,
+        tipoCategoria: body.tipoCategoria
     });
 
-    feriadoLegal.save((err, feriadoLegalGuardado) => {
+    categoria.save((err, categoriaGuardado) => {
         if (err) {
             return res.status(400).json({
                 ok: false,
-                mensaje: 'Error al crear feriado legal',
+                mensaje: 'Error al crear tipo de categoria',
                 errors: err
             });
         }
         res.status(201).json({
             ok: true,
-            feriadoLegal: feriadoLegalGuardado
+            categoria: categoriaGuardado
         });
     });
 
 });
 
 // ==============================================
-//  Actualizar feriado legal
+//  Actualizar categoria
 // ==============================================
 app.put('/:id', mdAutenticacion.verificaToken, (req, res) => {
 
     var id = req.params.id;
     var body = req.body;
 
-    FeriadoLegal.findById(id, (err, feriadoLegal) => {
+    Categoria.findById(id, (err, categoria) => {
 
         if (err) {
             return res.status(400).json({
                 ok: false,
-                mensaje: 'El feriado legal con el id ' + id + ' no existe',
-                errors: { message: 'No existe un feriado legal con ese ID' }
+                mensaje: 'La categoria con el id ' + id + ' no existe',
+                errors: { message: 'No existe categoria con ese ID' }
             });
         }
 
-        feriadoLegal.dias_vacaciones_fijos = body.dias_vacaciones_fijos,
-            feriadoLegal.dias_vacaciones_acumulados = body.dias_vacaciones_acumulados,
-            feriadoLegal.fecha_inicio_vacaciones = body.fecha_inicio_vacaciones,
-            feriadoLegal.fecha_termino_vacaciones = body.fecha_termino_vacaciones,
-            feriadoLegal.dias_vacaciones_restantes = body.dias_vacaciones_restantes
+        categoria.nombre_cargo_funcionario = body.nombre_cargo_funcionario;
+        categoria.descripcion_cargo_funcionario = body.descripcion_cargo_funcionario;
+        categoria.tipoCategoria = body.tipoCategoria;
+        usuario = req.usuario._id;
 
-        feriadoLegal.save((err, feriadoLegalGuardado) => {
+        categoria.save((err, categoriaGuardado) => {
             if (err) {
                 return res.status(500).json({
                     ok: false,
-                    mensaje: 'Error al actualizar el feriado legal',
+                    mensaje: 'Error al actualizar categoria',
                     errors: err
                 });
             }
 
             res.status(200).json({
                 ok: true,
-                feriadoLegal: feriadoLegalGuardado
+                categoria: categoriaGuardado
             });
         });
 
@@ -106,31 +102,32 @@ app.put('/:id', mdAutenticacion.verificaToken, (req, res) => {
 });
 
 // ==============================================
-//  Borrar un Feriado legal por el id
+//  Borrar una categoria por el id
 // ==============================================
 app.delete('/:id', mdAutenticacion.verificaToken, (req, res) => {
+
     var id = req.params.id;
 
-    FeriadoLegal.findByIdAndRemove(id, (err, feriadoLegalBorrado) => {
+    Categoria.findByIdAndRemove(id, (err, categoriaBorrado) => {
         if (err) {
             return res.status(500).json({
                 ok: false,
-                mensaje: 'Error al borrar feriado legal',
+                mensaje: 'Error al borrar categoria',
                 errors: err
             });
         }
 
-        if (!feriadoLegalBorrado) {
+        if (!categoriaBorrado) {
             return res.status(400).json({
                 ok: false,
-                mensaje: 'No existe un feriado legal con ese id',
-                errors: { message: 'No existe un feriado legal con ese id' }
+                mensaje: 'No existe una categoria con ese id',
+                errors: { message: 'No existe una categoria con ese id' }
             });
         }
 
         res.status(200).json({
             ok: true,
-            feriadoLegal: feriadoLegalBorrado
+            categoria: categoriaBorrado
         });
     });
 });

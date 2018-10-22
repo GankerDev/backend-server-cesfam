@@ -4,100 +4,97 @@ var mdAutenticacion = require('../middlewares/autenticacion');
 
 var app = express();
 
-var FeriadoLegal = require('../models/feriadoLegal');
+var Capacitacion = require('../models/capacitacion');
 
 // ==============================================
-//  Obtener todos los feriados legales
+//  Obtener todos las capacitaciones
 // ==============================================
 
 app.get('/', (req, res, next) => {
 
-    FeriadoLegal.find({})
+    Capacitacion.find({})
         .exec(
-            (err, feriadosLegales) => {
+            (err, Capacitaciones) => {
                 if (err) {
                     return res.status(500).json({
                         ok: false,
-                        mensaje: 'Error cargando feriado legal',
+                        mensaje: 'Error cargando capacitacion',
                         errors: err
                     });
                 }
                 res.status(200).json({
                     ok: true,
-                    feriadosLegales: feriadosLegales
+                    Capacitaciones: Capacitaciones
                 });
 
             })
 });
 
 // ==============================================
-//  Crear nuevo feriado legal
+//  Crear nueva capacitacion
 // ==============================================
 app.post('/', mdAutenticacion.verificaToken, (req, res) => {
 
     var body = req.body;
 
-    var feriadoLegal = new FeriadoLegal({
-        dias_vacaciones_fijos: body.dias_vacaciones_fijos,
-        dias_vacaciones_acumulados: body.dias_vacaciones_acumulados,
-        fecha_inicio_vacaciones: body.fecha_inicio_vacaciones,
-        fecha_termino_vacaciones: body.fecha_termino_vacaciones,
-        dias_vacaciones_restantes: body.dias_vacaciones_restantes,
+    var capacitacion = new Capacitacion({
+        nombre_capacitacion: body.nombre_capacitacion,
+        descripcion_capacitacion: body.descripcion_capacitacion,
         usuario: req.usuario._id
     });
 
-    feriadoLegal.save((err, feriadoLegalGuardado) => {
+    capacitacion.save((err, capacitacionGuardado) => {
         if (err) {
             return res.status(400).json({
                 ok: false,
-                mensaje: 'Error al crear feriado legal',
+                mensaje: 'Error al crear tipo de capacitacion',
                 errors: err
             });
         }
         res.status(201).json({
             ok: true,
-            feriadoLegal: feriadoLegalGuardado
+            capacitacion: capacitacionGuardado,
+            usuario: req.usuario._id
         });
     });
 
 });
 
 // ==============================================
-//  Actualizar feriado legal
+//  Actualizar capacitacion
 // ==============================================
 app.put('/:id', mdAutenticacion.verificaToken, (req, res) => {
 
     var id = req.params.id;
     var body = req.body;
 
-    FeriadoLegal.findById(id, (err, feriadoLegal) => {
+    Capacitacion.findById(id, (err, capacitacion) => {
 
         if (err) {
             return res.status(400).json({
                 ok: false,
-                mensaje: 'El feriado legal con el id ' + id + ' no existe',
-                errors: { message: 'No existe un feriado legal con ese ID' }
+                mensaje: 'La capacitacion con el id ' + id + ' no existe',
+                errors: { message: 'No existe capacitacion con ese ID' }
             });
         }
 
-        feriadoLegal.dias_vacaciones_fijos = body.dias_vacaciones_fijos,
-            feriadoLegal.dias_vacaciones_acumulados = body.dias_vacaciones_acumulados,
-            feriadoLegal.fecha_inicio_vacaciones = body.fecha_inicio_vacaciones,
-            feriadoLegal.fecha_termino_vacaciones = body.fecha_termino_vacaciones,
-            feriadoLegal.dias_vacaciones_restantes = body.dias_vacaciones_restantes
+        capacitacion.nombre_capacitacion = body.nombre_capacitacion;
+        capacitacion.descripcion_capacitacion = body.descripcion_capacitacion;
+        usuario = req.usuario._id;
 
-        feriadoLegal.save((err, feriadoLegalGuardado) => {
+        capacitacion.save((err, capacitacionGuardado) => {
             if (err) {
                 return res.status(500).json({
                     ok: false,
-                    mensaje: 'Error al actualizar el feriado legal',
+                    mensaje: 'Error al actualizar capacitacion',
                     errors: err
                 });
             }
 
             res.status(200).json({
                 ok: true,
-                feriadoLegal: feriadoLegalGuardado
+                capacitacion: capacitacionGuardado,
+                usuario
             });
         });
 
@@ -106,31 +103,32 @@ app.put('/:id', mdAutenticacion.verificaToken, (req, res) => {
 });
 
 // ==============================================
-//  Borrar un Feriado legal por el id
+//  Borrar una capacitacion por el id
 // ==============================================
 app.delete('/:id', mdAutenticacion.verificaToken, (req, res) => {
+
     var id = req.params.id;
 
-    FeriadoLegal.findByIdAndRemove(id, (err, feriadoLegalBorrado) => {
+    Capacitacion.findByIdAndRemove(id, (err, capacitacionBorrado) => {
         if (err) {
             return res.status(500).json({
                 ok: false,
-                mensaje: 'Error al borrar feriado legal',
+                mensaje: 'Error al borrar capacitacion',
                 errors: err
             });
         }
 
-        if (!feriadoLegalBorrado) {
+        if (!capacitacionBorrado) {
             return res.status(400).json({
                 ok: false,
-                mensaje: 'No existe un feriado legal con ese id',
-                errors: { message: 'No existe un feriado legal con ese id' }
+                mensaje: 'No existe una capacitacion con ese id',
+                errors: { message: 'No existe una capacitacion con ese id' }
             });
         }
 
         res.status(200).json({
             ok: true,
-            feriadoLegal: feriadoLegalBorrado
+            capacitacion: capacitacionBorrado
         });
     });
 });

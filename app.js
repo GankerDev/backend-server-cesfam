@@ -11,6 +11,10 @@ var tipoPermisoRoutes = require('./routes/tipoPermisos');
 var permisoRoutes = require('./routes/permiso');
 var feriadoLegalRoutes = require('./routes/feriadoLegal');
 var licenciaMedicaRoutes = require('./routes/licenciaMedica');
+var tipoCategoriaRoutes = require('./routes/tipoCategoria');
+var categoriaRoutes = require('./routes/categoria');
+var capacitacionRoutes = require('./routes/capacitacion');
+var funcionarioRoutes = require('./routes/funcionario');
 
 //Inicializar varriables
 var app = express();
@@ -28,6 +32,10 @@ mongoose.connection.openUri('mongodb://localhost:27017/cesfamDB', (err, res) => 
 });
 
 // Rutas
+app.use('/funcionario', funcionarioRoutes);
+app.use('/capacitacion', capacitacionRoutes);
+app.use('/categoria', categoriaRoutes);
+app.use('/tipo-categoria', tipoCategoriaRoutes);
 app.use('/licencia-medica', licenciaMedicaRoutes);
 app.use('/feriado-legal', feriadoLegalRoutes);
 app.use('/permiso', permisoRoutes);

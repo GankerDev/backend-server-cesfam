@@ -60,7 +60,7 @@ app.post('/', mdAutenticacion.verificaToken, (req, res) => {
 // ==============================================
 //  Actualizar tipo de permiso
 // ==============================================
-app.put('/:id', (req, res) => {
+app.put('/:id', mdAutenticacion.verificaToken, (req, res) => {
 
     var id = req.params.id;
     var body = req.body;
@@ -76,6 +76,7 @@ app.put('/:id', (req, res) => {
         }
 
         tipoPermiso.nombre = body.nombre;
+        usuario = req.usuario._id;
 
         tipoPermiso.save((err, tipoPermisoGuardado) => {
             if (err) {
