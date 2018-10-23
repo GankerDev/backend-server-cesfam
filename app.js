@@ -15,6 +15,14 @@ var tipoCategoriaRoutes = require('./routes/tipoCategoria');
 var categoriaRoutes = require('./routes/categoria');
 var capacitacionRoutes = require('./routes/capacitacion');
 var funcionarioRoutes = require('./routes/funcionario');
+var tipoContratoRoutes = require('./routes/tipoContrato');
+//Rutas Puntajes
+var capacitacionNivelTecnicoRoutes = require('./routes/puntajes/capacitacionNivelTecnico');
+var capacitacionNotaRoutes = require('./routes/puntajes/capacitacionNota');
+var puntajeABRoutes = require('./routes/puntajes/puntajeAB');
+var puntajeCapABRoutes = require('./routes/puntajes/puntajeCapAb');
+var puntajeCapCDEFRoutes = require('./routes/puntajes/puntajeCapCDEF');
+var puntajeExpRoutes = require('./routes/puntajes/puntajeExp');
 
 //Inicializar varriables
 var app = express();
@@ -31,7 +39,16 @@ mongoose.connection.openUri('mongodb://localhost:27017/cesfamDB', (err, res) => 
     console.log('Base de datos: \x1b[32m%s\x1b[0m', 'online');
 });
 
+//Rutas Puntajes
+app.use('/cap-nive-tecnico', capacitacionNivelTecnicoRoutes);
+app.use('/cap-notas', capacitacionNotaRoutes);
+app.use('/puntajeAb', puntajeABRoutes);
+app.use('/puntaje-cap-ab', puntajeCapABRoutes);
+app.use('/puntaje-cap-cdef', puntajeCapCDEFRoutes);
+app.use('/puntaje-exp', puntajeExpRoutes);
+
 // Rutas
+app.use('/tipo-contrato', tipoContratoRoutes);
 app.use('/funcionario', funcionarioRoutes);
 app.use('/capacitacion', capacitacionRoutes);
 app.use('/categoria', categoriaRoutes);
