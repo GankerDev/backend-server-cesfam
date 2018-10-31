@@ -13,6 +13,7 @@ var PuntajeCapAB = require('../../models/puntajes/puntajeCapAB');
 app.get('/', (req, res, next) => {
 
     PuntajeCapAB.find({})
+        .populate('usuario', 'nombre email')
         .exec(
             (err, Puntajes) => {
                 if (err) {
@@ -54,8 +55,7 @@ app.post('/', mdAutenticacion.verificaToken, (req, res) => {
         }
         res.status(201).json({
             ok: true,
-            puntajeCapAB: puntajeCapABGuardado,
-            usuario: req.usuario._id
+            puntajeCapAB: puntajeCapABGuardado
         });
     });
 
@@ -82,7 +82,7 @@ app.put('/:id', mdAutenticacion.verificaToken, (req, res) => {
         puntaje.rango_min = body.rango_min;
         puntaje.rango_max = body.rango_max;
         puntaje.puntaje = body.puntaje;
-        usuario = req.usuario._id;
+        puntaje.usuario = req.usuario._id;
 
         puntaje.save((err, puntajeGuardado) => {
 
@@ -96,8 +96,7 @@ app.put('/:id', mdAutenticacion.verificaToken, (req, res) => {
 
             res.status(200).json({
                 ok: true,
-                puntaje: puntajeGuardado,
-                usuario
+                puntaje: puntajeGuardado
             });
         });
 

@@ -13,6 +13,7 @@ var PuntajeCDEF = require('../../models/puntajes/puntajeCDEF');
 app.get('/', (req, res, next) => {
 
     PuntajeCDEF.find({})
+        .populate('usuario', 'nombre email')
         .exec(
             (err, Puntajes) => {
                 if (err) {
@@ -55,7 +56,6 @@ app.post('/', mdAutenticacion.verificaToken, (req, res) => {
         res.status(201).json({
             ok: true,
             puntaje: puntajeGuardado,
-            usuario: req.usuario._id
         });
     });
 
@@ -82,7 +82,7 @@ app.put('/:id', mdAutenticacion.verificaToken, (req, res) => {
         puntaje.nivel = body.nivel;
         puntaje.rango_min = body.rango_min;
         puntaje.rango_max = body.rango_max;
-        usuario = req.usuario._id;
+        puntaje.usuario = req.usuario._id;
 
         puntaje.save((err, puntajeGuardado) => {
             if (err) {
@@ -96,7 +96,6 @@ app.put('/:id', mdAutenticacion.verificaToken, (req, res) => {
             res.status(200).json({
                 ok: true,
                 puntaje: puntajeGuardado,
-                usuario
             });
         });
 

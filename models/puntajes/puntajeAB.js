@@ -6,6 +6,7 @@ var puntajeABSchema = new Schema({
     nivel: { type: String },
     rango_min: { type: Number },
     rango_max: { type: Number },
+    usuario: { type: Schema.Types.ObjectId, ref: 'Usuario' }
 }, { collection: 'puntajeAB' });
 
 module.exports = mongoose.model('puntajeAB', puntajeABSchema);

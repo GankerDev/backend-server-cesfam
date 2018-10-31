@@ -16,12 +16,14 @@ var funcionarioSchema = new Schema({
     total_puntaje: { type: Number },
     nivel_actual: { type: String },
     tipo_contrato: { type: String },
+    img: { type: String, required: false },
 
     categoria_funcionario: { type: Schema.Types.ObjectId, ref: 'categoria', required: [true, 'El id tipo categoria es un campo obligatorio'] },
     licencia_medica: { type: Schema.Types.ObjectId, ref: 'licenciaMedica' },
     feriadoLegal: { type: Schema.Types.ObjectId, ref: 'feriadoLegal' },
     permiso: { type: Schema.Types.ObjectId, ref: 'permiso' },
     capacitacion: { type: Schema.Types.ObjectId, ref: 'capacitacion' },
+    usuario: { type: Schema.Types.ObjectId, ref: 'Usuario' }
 }, { collection: 'funcionario' });
 
 funcionarioSchema.plugin(uniqueValidator, { message: '{PATH} debe ser único' });

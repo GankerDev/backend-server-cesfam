@@ -12,7 +12,14 @@ var Permiso = require('../models/permiso');
 
 app.get('/', (req, res, next) => {
 
+    var desde = req.query.desde || 0;
+    desde = Number(desde);
+
     Permiso.find({})
+        .skip(desde)
+        .limit(5)
+        .populate('usuario', 'nombre email')
+        .populate('tipoPermisos')
         .exec(
             (err, permisos) => {
                 if (err) {
@@ -22,12 +29,15 @@ app.get('/', (req, res, next) => {
                         errors: err
                     });
                 }
-                res.status(200).json({
-                    ok: true,
-                    permisos
+                Permiso.count({}, (err, conteo) => {
+                    res.status(200).json({
+                        ok: true,
+                        permisos,
+                        total: conteo
+                    });
                 });
 
-            })
+            });
 });
 
 // ==============================================

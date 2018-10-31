@@ -12,7 +12,14 @@ var Categoria = require('../models/categoria');
 
 app.get('/', (req, res, next) => {
 
+    var desde = req.query.desde || 0;
+    desde = Number(desde);
+
     Categoria.find({})
+        .skip(desde)
+        .limit(5)
+        .populate('usuario', 'nombre email')
+        .populate('tipoCategoria')
         .exec(
             (err, Categorias) => {
                 if (err) {
@@ -22,9 +29,12 @@ app.get('/', (req, res, next) => {
                         errors: err
                     });
                 }
-                res.status(200).json({
-                    ok: true,
-                    Categorias: Categorias
+                Categoria.count({}, (err, conteo) => {
+                    res.status(200).json({
+                        ok: true,
+                        Categorias: Categorias,
+                        total: conteo
+                    });
                 });
 
             })
@@ -40,7 +50,8 @@ app.post('/', mdAutenticacion.verificaToken, (req, res) => {
     var categoria = new Categoria({
         nombre_cargo_funcionario: body.nombre_cargo_funcionario,
         descripcion_cargo_funcionario: body.descripcion_cargo_funcionario,
-        tipoCategoria: body.tipoCategoria
+        tipoCategoria: body.tipoCategoria,
+        usuario: req.usuario._id
     });
 
     categoria.save((err, categoriaGuardado) => {
@@ -80,7 +91,7 @@ app.put('/:id', mdAutenticacion.verificaToken, (req, res) => {
         categoria.nombre_cargo_funcionario = body.nombre_cargo_funcionario;
         categoria.descripcion_cargo_funcionario = body.descripcion_cargo_funcionario;
         categoria.tipoCategoria = body.tipoCategoria;
-        usuario = req.usuario._id;
+        categoria.usuario = req.usuario._id;
 
         categoria.save((err, categoriaGuardado) => {
             if (err) {

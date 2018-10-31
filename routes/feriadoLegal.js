@@ -12,7 +12,13 @@ var FeriadoLegal = require('../models/feriadoLegal');
 
 app.get('/', (req, res, next) => {
 
+    var desde = req.query.desde || 0;
+    desde = Number(desde);
+
     FeriadoLegal.find({})
+        .skip(desde)
+        .limit(5)
+        .populate('usuario', 'nombre email')
         .exec(
             (err, feriadosLegales) => {
                 if (err) {
@@ -22,9 +28,12 @@ app.get('/', (req, res, next) => {
                         errors: err
                     });
                 }
-                res.status(200).json({
-                    ok: true,
-                    feriadosLegales: feriadosLegales
+                FeriadoLegal.count({}, (err, conteo) => {
+                    res.status(200).json({
+                        ok: true,
+                        feriadosLegales: feriadosLegales,
+                        total: conteo
+                    });
                 });
 
             })
@@ -84,7 +93,8 @@ app.put('/:id', mdAutenticacion.verificaToken, (req, res) => {
             feriadoLegal.dias_vacaciones_acumulados = body.dias_vacaciones_acumulados,
             feriadoLegal.fecha_inicio_vacaciones = body.fecha_inicio_vacaciones,
             feriadoLegal.fecha_termino_vacaciones = body.fecha_termino_vacaciones,
-            feriadoLegal.dias_vacaciones_restantes = body.dias_vacaciones_restantes
+            feriadoLegal.dias_vacaciones_restantes = body.dias_vacaciones_restantes,
+            feriadoLegal.usuario = req.usuario._id
 
         feriadoLegal.save((err, feriadoLegalGuardado) => {
             if (err) {

@@ -13,6 +13,7 @@ var capacitacionNT = require('../../models/puntajes/capacitacionNivelTecnico');
 app.get('/', (req, res, next) => {
 
     CapacitacionNT.find({})
+        .populate('usuario', 'nombre email')
         .exec(
             (err, CapacitacionesNT) => {
                 if (err) {

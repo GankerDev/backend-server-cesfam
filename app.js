@@ -23,6 +23,11 @@ var puntajeABRoutes = require('./routes/puntajes/puntajeAB');
 var puntajeCapABRoutes = require('./routes/puntajes/puntajeCapAb');
 var puntajeCapCDEFRoutes = require('./routes/puntajes/puntajeCapCDEF');
 var puntajeExpRoutes = require('./routes/puntajes/puntajeExp');
+// Busqueda
+var busquedaRoutes = require('./routes/busqueda');
+// Subir archivos
+var uploadRoutes = require('./routes/upload');
+var archivosRoutes = require('./routes/archivos');
 
 //Inicializar varriables
 var app = express();
@@ -47,6 +52,12 @@ mongoose.connection.openUri('mongodb://localhost:27017/cesfamDB', (err, res) => 
     console.log('Base de datos: \x1b[32m%s\x1b[0m', 'online');
 });
 
+// Server index config
+// var serveIndex = require('serve-index');
+// app.use(express.static(__dirname + '/'))
+// app.use('/uploads', serveIndex(__dirname + '/uploads'));
+
+
 //Rutas Puntajes
 app.use('/cap-nive-tecnico', capacitacionNivelTecnicoRoutes);
 app.use('/cap-notas', capacitacionNotaRoutes);
@@ -56,6 +67,9 @@ app.use('/puntaje-cap-cdef', puntajeCapCDEFRoutes);
 app.use('/puntaje-exp', puntajeExpRoutes);
 
 // Rutas
+app.use('/upload', uploadRoutes);
+app.use('/archivos', archivosRoutes);
+app.use('/busqueda', busquedaRoutes);
 app.use('/tipo-contrato', tipoContratoRoutes);
 app.use('/funcionario', funcionarioRoutes);
 app.use('/capacitacion', capacitacionRoutes);

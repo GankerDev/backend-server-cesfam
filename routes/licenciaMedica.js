@@ -12,7 +12,13 @@ var LicenciaMedica = require('../models/licenciaMedica');
 
 app.get('/', (req, res, next) => {
 
+    var desde = req.query.desde || 0;
+    desde = Number(desde);
+
     LicenciaMedica.find({})
+        .skip(desde)
+        .limit(5)
+        .populate('usuario', 'nombre email')
         .exec(
             (err, licenciasMedicas) => {
                 if (err) {
@@ -22,12 +28,16 @@ app.get('/', (req, res, next) => {
                         errors: err
                     });
                 }
-                res.status(200).json({
-                    ok: true,
-                    licenciasMedicas
+
+                LicenciaMedica.count({}, (err, conteo) => {
+                    res.status(200).json({
+                        ok: true,
+                        licenciasMedicas,
+                        total: conteo
+                    });
                 });
 
-            })
+            });
 });
 
 // ==============================================
@@ -94,7 +104,7 @@ app.put('/:id', mdAutenticacion.verificaToken, (req, res) => {
         licenciaMedica.renta1 = body.renta1;
         licenciaMedica.renta2 = body.renta2;
         licenciaMedica.renta3 = body.renta3;
-        usuario = req.usuario._id;
+        licenciaMedica.usuario = req.usuario._id;
 
         licenciaMedica.save((err, licenciaMedicaGuardado) => {
             if (err) {

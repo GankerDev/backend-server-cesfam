@@ -12,7 +12,13 @@ var Capacitacion = require('../models/capacitacion');
 
 app.get('/', (req, res, next) => {
 
+    var desde = req.query.desde || 0;
+    desde = Number(desde);
+
     Capacitacion.find({})
+        .skip(desde)
+        .limit(5)
+        .populate('usuario', 'nombre email')
         .exec(
             (err, Capacitaciones) => {
                 if (err) {
@@ -22,9 +28,12 @@ app.get('/', (req, res, next) => {
                         errors: err
                     });
                 }
-                res.status(200).json({
-                    ok: true,
-                    Capacitaciones: Capacitaciones
+                Capacitacion.count({}, (err, conteo) => {
+                    res.status(200).json({
+                        ok: true,
+                        Capacitaciones: Capacitaciones,
+                        total: conteo
+                    });
                 });
 
             })
@@ -54,7 +63,6 @@ app.post('/', mdAutenticacion.verificaToken, (req, res) => {
         res.status(201).json({
             ok: true,
             capacitacion: capacitacionGuardado,
-            usuario: req.usuario._id
         });
     });
 
@@ -80,7 +88,7 @@ app.put('/:id', mdAutenticacion.verificaToken, (req, res) => {
 
         capacitacion.nombre_capacitacion = body.nombre_capacitacion;
         capacitacion.descripcion_capacitacion = body.descripcion_capacitacion;
-        usuario = req.usuario._id;
+        capacitacion.usuario = req.usuario._id;
 
         capacitacion.save((err, capacitacionGuardado) => {
             if (err) {
@@ -94,7 +102,6 @@ app.put('/:id', mdAutenticacion.verificaToken, (req, res) => {
             res.status(200).json({
                 ok: true,
                 capacitacion: capacitacionGuardado,
-                usuario
             });
         });
 

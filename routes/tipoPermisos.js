@@ -12,7 +12,13 @@ var TipoPermiso = require('../models/tipoPermisos');
 
 app.get('/', (req, res, next) => {
 
+    var desde = req.query.desde || 0;
+    desde = Number(desde);
+
     TipoPermiso.find({})
+        .skip(desde)
+        .limit(5)
+        .populate('usuario', 'nombre email')
         .exec(
             (err, tipoPermisos) => {
                 if (err) {
@@ -22,12 +28,15 @@ app.get('/', (req, res, next) => {
                         errors: err
                     });
                 }
-                res.status(200).json({
-                    ok: true,
-                    tipoPermisos: tipoPermisos
-                });
 
-            })
+                TipoPermiso.count({}, (err, conteo) => {
+                    res.status(200).json({
+                        ok: true,
+                        tipoPermisos: tipoPermisos,
+                        total: conteo
+                    });
+                });
+            });
 });
 
 // ==============================================
@@ -38,7 +47,8 @@ app.post('/', mdAutenticacion.verificaToken, (req, res) => {
     var body = req.body;
 
     var tipoPermiso = new TipoPermiso({
-        nombre: body.nombre
+        nombre: body.nombre,
+        usuario: req.usuario._id
     });
 
     tipoPermiso.save((err, tipoPermisoGuardado) => {

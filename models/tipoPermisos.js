@@ -9,7 +9,8 @@ var tipoPermisos = {
 }
 
 var tipoPermisosSchema = new Schema({
-    nombre: { type: String, unique: true, required: true, enum: tipoPermisos }
+    nombre: { type: String, unique: true, required: true, enum: tipoPermisos },
+    usuario: { type: Schema.Types.ObjectId, ref: 'Usuario' }
 }, { collection: 'tipoPermisos' });
 
 tipoPermisosSchema.plugin(uniqueValidator, { message: '{PATH} debe ser único' });

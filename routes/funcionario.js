@@ -12,7 +12,18 @@ var Funcionario = require('../models/funcionario');
 
 app.get('/', (req, res, next) => {
 
+    var desde = req.query.desde || 0;
+    desde = Number(desde);
+
     Funcionario.find({})
+        .skip(desde)
+        .limit(5)
+        .populate('usuario', 'nombre email')
+        .populate('categoria_funcionario')
+        .populate('licencia_medica')
+        .populate('feriadoLegal')
+        .populate('permiso')
+        .populate('capacitacion')
         .exec(
             (err, funcionarios) => {
                 if (err) {
@@ -22,9 +33,12 @@ app.get('/', (req, res, next) => {
                         errors: err
                     });
                 }
-                res.status(200).json({
-                    ok: true,
-                    funcionarios: funcionarios
+                Funcionario.count({}, (err, conteo) => {
+                    res.status(200).json({
+                        ok: true,
+                        funcionarios: funcionarios,
+                        total: conteo
+                    });
                 });
 
             })
@@ -110,7 +124,7 @@ app.put('/:id', mdAutenticacion.verificaToken, (req, res) => {
         funcionario.feriadoLegal = body.feriadoLegal;
         funcionario.permiso = body.permiso;
         funcionario.capacitacion = body.capacitacion;
-        usuario = req.usuario._i;
+        funcionario.usuario = req.usuario._id;
 
         funcionario.save((err, funcionarioGuardado) => {
             if (err) {
@@ -124,7 +138,6 @@ app.put('/:id', mdAutenticacion.verificaToken, (req, res) => {
             res.status(200).json({
                 ok: true,
                 funcionario: funcionarioGuardado,
-                usuario: req.usuario._id
             });
         });
 

@@ -13,6 +13,7 @@ var CapacitacionNota = require('../../models/puntajes/capacitacionNota');
 app.get('/', (req, res, next) => {
 
     CapacitacionNota.find({})
+        .populate('usuario', 'nombre email')
         .exec(
             (err, CapacitacionesNota) => {
                 if (err) {
@@ -54,8 +55,7 @@ app.post('/', mdAutenticacion.verificaToken, (req, res) => {
         }
         res.status(201).json({
             ok: true,
-            capacitacionNota: capacitacionNotaGuardado,
-            usuario: req.usuario._id
+            capacitacionNota: capacitacionNotaGuardado
         });
     });
 
@@ -82,7 +82,7 @@ app.put('/:id', mdAutenticacion.verificaToken, (req, res) => {
         capacitacionNota.aprobacion_minima = body.aprobacion_minima;
         capacitacionNota.aprobacion_maxima = body.aprobacion_maxima;
         capacitacionNota.factor = body.factor;
-        usuario = req.usuario._id;
+        capacitacionNota.usuario = req.usuario._id;
 
         capacitacionNota.save((err, capacitacionNotaGuardado) => {
             if (err) {
@@ -95,8 +95,7 @@ app.put('/:id', mdAutenticacion.verificaToken, (req, res) => {
 
             res.status(200).json({
                 ok: true,
-                capacitacionNota: capacitacionNotaGuardado,
-                usuario
+                capacitacionNota: capacitacionNotaGuardado
             });
         });
 

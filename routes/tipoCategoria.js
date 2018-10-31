@@ -12,7 +12,13 @@ var TipoCategoria = require('../models/tipoCategoria');
 
 app.get('/', (req, res, next) => {
 
+    var desde = req.query.desde || 0;
+    desde = Number(desde);
+
     TipoCategoria.find({})
+        .skip(desde)
+        .limit(5)
+        .populate('usuario', 'nombre email')
         .exec(
             (err, tipoCategorias) => {
                 if (err) {
@@ -22,12 +28,16 @@ app.get('/', (req, res, next) => {
                         errors: err
                     });
                 }
-                res.status(200).json({
-                    ok: true,
-                    tipoCategorias: tipoCategorias
+
+                TipoCategoria.count({}, (err, conteo) => {
+                    res.status(200).json({
+                        ok: true,
+                        tipoCategorias: tipoCategorias,
+                        total: conteo
+                    });
                 });
 
-            })
+            });
 });
 
 // ==============================================

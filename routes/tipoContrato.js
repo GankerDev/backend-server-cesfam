@@ -12,7 +12,13 @@ var TipoContrato = require('../models/tipoContrato');
 
 app.get('/', (req, res, next) => {
 
+    var desde = req.query.desde || 0;
+    desde = Number(desde);
+
     TipoContrato.find({})
+        .skip(desde)
+        .limit(5)
+        .populate('usuario', 'nombre email')
         .exec(
             (err, tipoContratos) => {
                 if (err) {
@@ -22,12 +28,14 @@ app.get('/', (req, res, next) => {
                         errors: err
                     });
                 }
-                res.status(200).json({
-                    ok: true,
-                    tipoContratos: tipoContratos
+                TipoContrato.count({}, (err, conteo) => {
+                    res.status(200).json({
+                        ok: true,
+                        tipoContratos: tipoContratos,
+                        total: conteo
+                    });
                 });
-
-            })
+            });
 });
 
 // ==============================================
@@ -39,7 +47,8 @@ app.post('/', mdAutenticacion.verificaToken, (req, res) => {
 
     var tipoContrato = new TipoContrato({
         nombre_tipo_contrato: body.nombre_tipo_contrato,
-        descripcion_tipo_contrato: body.descripcion_tipo_contrato
+        descripcion_tipo_contrato: body.descripcion_tipo_contrato,
+        usuario: req.usuario._id
     });
 
     tipoContrato.save((err, tipoContratoGuardado) => {
@@ -78,7 +87,7 @@ app.put('/:id', mdAutenticacion.verificaToken, (req, res) => {
 
         tipoContrato.nombre_tipo_contrato = body.nombre_tipo_contrato;
         tipoContrato.descripcion_tipo_contrato = body.descripcion_tipo_contrato;
-        usuario = req.usuario._id;
+        tipoContrato.usuario = req.usuario._id;
 
         tipoContrato.save((err, tipoContratoGuardado) => {
             if (err) {

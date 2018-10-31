@@ -13,6 +13,7 @@ var PuntajeExp = require('../../models/puntajes/puntajeExp');
 app.get('/', (req, res, next) => {
 
     PuntajeExp.find({})
+        .populate('usuario', 'nombre email')
         .exec(
             (err, Puntajes) => {
                 if (err) {
@@ -54,7 +55,6 @@ app.post('/', mdAutenticacion.verificaToken, (req, res) => {
         res.status(201).json({
             ok: true,
             puntaje: puntajeGuardado,
-            usuario: req.usuario._id
         });
     });
 
@@ -80,7 +80,7 @@ app.put('/:id', mdAutenticacion.verificaToken, (req, res) => {
 
         puntaje.bienio = body.bienio;
         puntaje.puntaje = body.puntaje;
-        usuario = req.usuario._id;
+        puntaje.usuario = req.usuario._id;
 
         puntaje.save((err, puntajeGuardado) => {
             if (err) {
@@ -93,8 +93,7 @@ app.put('/:id', mdAutenticacion.verificaToken, (req, res) => {
 
             res.status(200).json({
                 ok: true,
-                puntaje: puntajeGuardado,
-                usuario
+                puntaje: puntajeGuardado
             });
         });
 
