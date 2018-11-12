@@ -38,6 +38,36 @@ app.get('/', (req, res, next) => {
 
             })
 });
+// ==============================================
+//  Obtener capacitación por ID
+// ==============================================
+app.get('/:id', (req, res) => {
+    var id = req.params.id;
+    Capacitacion.findById(id)
+        .populate('usuario', 'nombre img email')
+        .exec((err, capacitacion) => {
+            if (err){
+                return res.status(500).json({
+                    ok: false,
+                    mensaje: 'Error al buscar capacitación',
+                    errors: err
+                });
+            }
+            if(!capacitacion){
+                return res.status(400).json({
+                    ok: false,
+                    mensaje: 'La capacitación con el id '+ id + ' no existe',
+                    errors: {message: 'No existe una capacitación con ese ID'}
+                });
+            }
+            res.status(200).json({
+                ok: true,
+                capacitacion: capacitacion
+            });
+        })
+
+
+})
 
 // ==============================================
 //  Crear nueva capacitacion

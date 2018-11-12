@@ -41,6 +41,36 @@ app.get('/', (req, res, next) => {
 });
 
 // ==============================================
+//  Obtener categoría por ID
+// ==============================================
+app.get('/:id', (req, res) => {
+    var id = req.params.id;
+    Categoria.findById(id)
+        .populate('usuario', 'nombre img email')
+        .populate('tipoCategoria')
+        .exec((err, categoria) => {
+            if (err){
+                return res.status(500).json({
+                    ok: false,
+                    mensaje: 'Error al buscar categoría',
+                    errors: err
+                });
+            }
+            if(!categoria){
+                return res.status(400).json({
+                    ok: false,
+                    mensaje: 'La categoria con el id '+ id + ' no existe',
+                    errors: {message: 'No existe una categoria con ese ID'}
+                });
+            }
+            res.status(200).json({
+                ok: true,
+                categoria: categoria
+            });
+        })
+});
+
+// ==============================================
 //  Crear nueva categoria
 // ==============================================
 app.post('/', mdAutenticacion.verificaToken, (req, res) => {

@@ -41,6 +41,35 @@ app.get('/', (req, res, next) => {
 });
 
 // ==============================================
+//  Obtener tipo de categoria por ID
+// ==============================================
+app.get('/:id', (req, res) => {
+    var id = req.params.id;
+    TipoCategoria.findById(id)
+        .populate('usuario', 'nombre img email')
+        .exec((err, tipoCategoria) => {
+            if (err){
+                return res.status(500).json({
+                    ok: false,
+                    mensaje: 'Error al buscar tipo categoria',
+                    errors: err
+                });
+            }
+            if(!tipoCategoria){
+                return res.status(400).json({
+                    ok: false,
+                    mensaje: 'El tipo categoria con el id '+ id + ' no existe',
+                    errors: {message: 'No existe un tipo categoria con ese ID'}
+                });
+            }
+            res.status(200).json({
+                ok: true,
+                tipoCategoria: tipoCategoria
+            });
+        })
+});
+
+// ==============================================
 //  Crear nuevo tipo de categoria
 // ==============================================
 app.post('/', mdAutenticacion.verificaToken, (req, res) => {

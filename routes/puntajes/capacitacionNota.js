@@ -32,6 +32,35 @@ app.get('/', (req, res, next) => {
 });
 
 // ==============================================
+//  Obtener nota capacitación por ID
+// ==============================================
+app.get('/:id', (req, res) => {
+    var id = req.params.id;
+    CapacitacionNota.findById(id)
+        .populate('usuario', 'nombre img email')
+        .exec((err, capacitacionNota) => {
+            if (err){
+                return res.status(500).json({
+                    ok: false,
+                    mensaje: 'Error al buscar nota capacitación',
+                    errors: err
+                });
+            }
+            if(!capacitacionNota){
+                return res.status(400).json({
+                    ok: false,
+                    mensaje: 'La nota capacitación con el id '+ id + ' no existe',
+                    errors: {message: 'No existe una nota capacitación con ese ID'}
+                });
+            }
+            res.status(200).json({
+                ok: true,
+                capacitacionNota: capacitacionNota
+            });
+        })
+});
+
+// ==============================================
 //  Crear nueva capacitacion
 // ==============================================
 app.post('/', mdAutenticacion.verificaToken, (req, res) => {

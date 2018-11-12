@@ -40,6 +40,35 @@ app.get('/', (req, res, next) => {
 });
 
 // ==============================================
+//  Obtener feriado legal por ID
+// ==============================================
+app.get('/:id', (req, res) => {
+    var id = req.params.id;
+    FeriadoLegal.findById(id)
+        .populate('usuario', 'nombre img email')
+        .exec((err, feriadoLegal) => {
+            if (err){
+                return res.status(500).json({
+                    ok: false,
+                    mensaje: 'Error al buscar feriado legal',
+                    errors: err
+                });
+            }
+            if(!feriadoLegal){
+                return res.status(400).json({
+                    ok: false,
+                    mensaje: 'El feriado legal con el id '+ id + ' no existe',
+                    errors: {message: 'No existe un feriado legal con ese ID'}
+                });
+            }
+            res.status(200).json({
+                ok: true,
+                feriadoLegal: feriadoLegal
+            });
+        })
+});
+
+// ==============================================
 //  Crear nuevo feriado legal
 // ==============================================
 app.post('/', mdAutenticacion.verificaToken, (req, res) => {

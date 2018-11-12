@@ -41,6 +41,36 @@ app.get('/', (req, res, next) => {
 });
 
 // ==============================================
+//  Obtener permiso por ID
+// ==============================================
+app.get('/:id', (req, res) => {
+    var id = req.params.id;
+    Permiso.findById(id)
+        .populate('usuario', 'nombre img email')
+        .populate('tipoPermisos')
+        .exec((err, permiso) => {
+            if (err){
+                return res.status(500).json({
+                    ok: false,
+                    mensaje: 'Error al buscar permiso',
+                    errors: err
+                });
+            }
+            if(!permiso){
+                return res.status(400).json({
+                    ok: false,
+                    mensaje: 'El permiso con el id '+ id + ' no existe',
+                    errors: {message: 'No existe un permiso con ese ID'}
+                });
+            }
+            res.status(200).json({
+                ok: true,
+                permiso: permiso
+            });
+        })
+});
+
+// ==============================================
 //  Crear nuevo permiso
 // ==============================================
 app.post('/', mdAutenticacion.verificaToken, (req, res) => {

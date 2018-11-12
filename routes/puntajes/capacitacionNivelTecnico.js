@@ -4,7 +4,7 @@ var mdAutenticacion = require('../../middlewares/autenticacion');
 
 var app = express();
 
-var capacitacionNT = require('../../models/puntajes/capacitacionNivelTecnico');
+var CapacitacionNT = require('../../models/puntajes/capacitacionNivelTecnico');
 
 // ==============================================
 //  Obtener capacitacion Nivel Tecnico
@@ -32,29 +32,58 @@ app.get('/', (req, res, next) => {
 });
 
 // ==============================================
+//  Obtener capacitación nivel técnico por ID
+// ==============================================
+app.get('/:id', (req, res) => {
+    var id = req.params.id;
+    CapacitacionNT.findById(id)
+        .populate('usuario', 'nombre img email')
+        .exec((err, capacitacionNT) => {
+            if (err){
+                return res.status(500).json({
+                    ok: false,
+                    mensaje: 'Error al buscar capacitación nivel técnico',
+                    errors: err
+                });
+            }
+            if(!capacitacionNT){
+                return res.status(400).json({
+                    ok: false,
+                    mensaje: 'La capacitación nivel técnico con el id '+ id + ' no existe',
+                    errors: {message: 'No existe una capacitación nivel técnico con ese ID'}
+                });
+            }
+            res.status(200).json({
+                ok: true,
+                capacitacionNT: capacitacionNT
+            });
+        })
+});
+
+// ==============================================
 //  Crear nueva capacitacion
 // ==============================================
 app.post('/', mdAutenticacion.verificaToken, (req, res) => {
 
     var body = req.body;
 
-    var capacitacionNT = new CapacitacionNT({
+    var CapacitacionNT = new CapacitacionNT({
         nivel_tecnico: body.nivel_tecnico,
         factor: body.factor,
         usuario: req.usuario._id
     });
 
-    capacitacionNT.save((err, capacitacionNTGuardado) => {
+    CapacitacionNT.save((err, capacitacionNTGuardado) => {
         if (err) {
             return res.status(400).json({
                 ok: false,
-                mensaje: 'Error al crear tipo de capacitacion',
+                mensaje: 'Error al crear capacitación nivel tecnico',
                 errors: err
             });
         }
         res.status(201).json({
             ok: true,
-            capacitacionNT: capacitacionNTGuardado,
+            CapacitacionNT: capacitacionNTGuardado,
             usuario: req.usuario._id
         });
     });

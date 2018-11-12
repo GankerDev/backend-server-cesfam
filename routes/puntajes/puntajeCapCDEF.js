@@ -32,6 +32,35 @@ app.get('/', (req, res, next) => {
 });
 
 // ==============================================
+//  Obtener puntaje capacitación CDEF por ID
+// ==============================================
+app.get('/:id', (req, res) => {
+    var id = req.params.id;
+    PuntajeCapCDEF.findById(id)
+        .populate('usuario', 'nombre img email')
+        .exec((err, puntajeCapCDEF) => {
+            if (err){
+                return res.status(500).json({
+                    ok: false,
+                    mensaje: 'Error al buscar puntaje',
+                    errors: err
+                });
+            }
+            if(!puntajeCapCDEF){
+                return res.status(400).json({
+                    ok: false,
+                    mensaje: 'El puntaje con el id '+ id + ' no existe',
+                    errors: {message: 'No existe un puntaje con ese ID'}
+                });
+            }
+            res.status(200).json({
+                ok: true,
+                puntajeCapCDEF: puntajeCapCDEF
+            });
+        })
+});
+
+// ==============================================
 //  Crear nuevo puntaje
 // ==============================================
 app.post('/', mdAutenticacion.verificaToken, (req, res) => {

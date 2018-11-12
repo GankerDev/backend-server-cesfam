@@ -20,6 +20,7 @@ var tipoContratoRoutes = require('./routes/tipoContrato');
 var capacitacionNivelTecnicoRoutes = require('./routes/puntajes/capacitacionNivelTecnico');
 var capacitacionNotaRoutes = require('./routes/puntajes/capacitacionNota');
 var puntajeABRoutes = require('./routes/puntajes/puntajeAB');
+var puntajeCDEFRoutes = require('./routes/puntajes/puntajeCDEF');
 var puntajeCapABRoutes = require('./routes/puntajes/puntajeCapAb');
 var puntajeCapCDEFRoutes = require('./routes/puntajes/puntajeCapCDEF');
 var puntajeExpRoutes = require('./routes/puntajes/puntajeExp');
@@ -62,6 +63,7 @@ mongoose.connection.openUri('mongodb://localhost:27017/cesfamDB', (err, res) => 
 app.use('/cap-nive-tecnico', capacitacionNivelTecnicoRoutes);
 app.use('/cap-notas', capacitacionNotaRoutes);
 app.use('/puntajeAb', puntajeABRoutes);
+app.use('/puntajeCDEF', puntajeCDEFRoutes);
 app.use('/puntaje-cap-ab', puntajeCapABRoutes);
 app.use('/puntaje-cap-cdef', puntajeCapCDEFRoutes);
 app.use('/puntaje-exp', puntajeExpRoutes);

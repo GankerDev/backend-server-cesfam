@@ -5,10 +5,10 @@ var Schema = mongoose.Schema;
 
 var feriadoLegalSchema = new Schema({
     dias_vacaciones_fijos: { type: Number, required: true },
-    dias_vacaciones_acumulados: { type: Number, required: true },
-    fecha_inicio_vacaciones: { type: Date, required: true },
-    fecha_termino_vacaciones: { type: Date, required: true },
-    dias_vacaciones_restantes: { type: Number, required: true },
+    dias_vacaciones_acumulados: { type: Number },
+    fecha_inicio_vacaciones: { type: Date },
+    fecha_termino_vacaciones: { type: Date },
+    dias_vacaciones_restantes: { type: Number },
     usuario: { type: Schema.Types.ObjectId, ref: 'Usuario' }
 }, { collection: 'feriadoLegal' });
 

@@ -40,6 +40,36 @@ app.get('/', (req, res, next) => {
 });
 
 // ==============================================
+//  Obtener tipo de permiso por ID
+// ==============================================
+app.get('/:id', (req, res) => {
+    var id = req.params.id;
+    TipoPermiso.findById(id)
+        .populate('usuario', 'nombre img email')
+        .exec((err, tipoPermiso) => {
+            if (err){
+                return res.status(500).json({
+                    ok: false,
+                    mensaje: 'Error al buscar tipo permiso',
+                    errors: err
+                });
+            }
+            if(!tipoPermiso){
+                return res.status(400).json({
+                    ok: false,
+                    mensaje: 'El tipo permiso con el id '+ id + ' no existe',
+                    errors: {message: 'No existe un tipo permiso con ese ID'}
+                });
+            }
+            res.status(200).json({
+                ok: true,
+                tipoPermiso: tipoPermiso
+            });
+        })
+});
+
+
+// ==============================================
 //  Crear nuevo tipo de permiso
 // ==============================================
 app.post('/', mdAutenticacion.verificaToken, (req, res) => {

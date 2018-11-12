@@ -41,6 +41,35 @@ app.get('/', (req, res, next) => {
 });
 
 // ==============================================
+//  Obtener licencia medica por ID
+// ==============================================
+app.get('/:id', (req, res) => {
+    var id = req.params.id;
+    LicenciaMedica.findById(id)
+        .populate('usuario', 'nombre img email')
+        .exec((err, licenciaMedica) => {
+            if (err){
+                return res.status(500).json({
+                    ok: false,
+                    mensaje: 'Error al buscar licencia medica',
+                    errors: err
+                });
+            }
+            if(!licenciaMedica){
+                return res.status(400).json({
+                    ok: false,
+                    mensaje: 'La licencia medica con el id '+ id + ' no existe',
+                    errors: {message: 'No existe una licencia médica con ese ID'}
+                });
+            }
+            res.status(200).json({
+                ok: true,
+                licenciaMedica: licenciaMedica
+            });
+        })
+});
+
+// ==============================================
 //  Crear nueva licencia medica
 // ==============================================
 app.post('/', mdAutenticacion.verificaToken, (req, res) => {
