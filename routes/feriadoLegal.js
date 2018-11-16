@@ -19,6 +19,7 @@ app.get('/', (req, res, next) => {
         .skip(desde)
         .limit(5)
         .populate('usuario', 'nombre email')
+        .populate( 'funcionario' )
         .exec(
             (err, feriadosLegales) => {
                 if (err) {
@@ -46,6 +47,7 @@ app.get('/:id', (req, res) => {
     var id = req.params.id;
     FeriadoLegal.findById(id)
         .populate('usuario', 'nombre img email')
+        .populate( 'funcionario' )
         .exec((err, feriadoLegal) => {
             if (err){
                 return res.status(500).json({
@@ -81,6 +83,7 @@ app.post('/', mdAutenticacion.verificaToken, (req, res) => {
         fecha_inicio_vacaciones: body.fecha_inicio_vacaciones,
         fecha_termino_vacaciones: body.fecha_termino_vacaciones,
         dias_vacaciones_restantes: body.dias_vacaciones_restantes,
+        funcionario: body.funcionario,
         usuario: req.usuario._id
     });
 
@@ -123,6 +126,7 @@ app.put('/:id', mdAutenticacion.verificaToken, (req, res) => {
             feriadoLegal.fecha_inicio_vacaciones = body.fecha_inicio_vacaciones,
             feriadoLegal.fecha_termino_vacaciones = body.fecha_termino_vacaciones,
             feriadoLegal.dias_vacaciones_restantes = body.dias_vacaciones_restantes,
+            feriadoLegal.funcionario = body.funcionario._id,
             feriadoLegal.usuario = req.usuario._id
 
         feriadoLegal.save((err, feriadoLegalGuardado) => {

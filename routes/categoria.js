@@ -46,7 +46,7 @@ app.get('/', (req, res, next) => {
 app.get('/:id', (req, res) => {
     var id = req.params.id;
     Categoria.findById(id)
-        .populate('usuario', 'nombre img email')
+        .populate('usuario', 'nombre email img')
         .populate('tipoCategoria')
         .exec((err, categoria) => {
             if (err){
@@ -88,11 +88,11 @@ app.post('/', mdAutenticacion.verificaToken, (req, res) => {
         if (err) {
             return res.status(400).json({
                 ok: false,
-                mensaje: 'Error al crear tipo de categoria',
+                mensaje: 'Error al crear categoria',
                 errors: err
             });
         }
-        res.status(201).json({
+        res.status(200).json({
             ok: true,
             categoria: categoriaGuardado
         });

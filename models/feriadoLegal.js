@@ -9,6 +9,7 @@ var feriadoLegalSchema = new Schema({
     fecha_inicio_vacaciones: { type: Date },
     fecha_termino_vacaciones: { type: Date },
     dias_vacaciones_restantes: { type: Number },
+    funcionario: { type: Schema.Types.ObjectId, ref: 'funcionario' },
     usuario: { type: Schema.Types.ObjectId, ref: 'Usuario' }
 }, { collection: 'feriadoLegal' });
 

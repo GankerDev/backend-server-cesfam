@@ -14,6 +14,7 @@ var licenciaMedicaSchema = new Schema({
     renta3: { type: Number, required: true },
     promedio: { type: Number, required: true },
     img: { type: String, required: false },
+    funcionario: { type: Schema.Types.ObjectId, ref: 'funcionario' },
     usuario: { type: Schema.Types.ObjectId, ref: 'Usuario' }
 
 }, { collection: 'licenciaMedica' });

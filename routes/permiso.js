@@ -20,6 +20,7 @@ app.get('/', (req, res, next) => {
         .limit(5)
         .populate('usuario', 'nombre email')
         .populate('tipoPermisos')
+        .populate( 'funcionario' )
         .exec(
             (err, permisos) => {
                 if (err) {
@@ -47,6 +48,7 @@ app.get('/:id', (req, res) => {
     var id = req.params.id;
     Permiso.findById(id)
         .populate('usuario', 'nombre img email')
+        .populate( 'funcionario' )
         .populate('tipoPermisos')
         .exec((err, permiso) => {
             if (err){
@@ -84,6 +86,7 @@ app.post('/', mdAutenticacion.verificaToken, (req, res) => {
         dias_restantes: body.dias_restantes,
         dias_adm_fijos: body.dias_adm_fijos,
         dias_adm_acumulados: body.dias_adm_acumulados,
+        funcionario: body.funcionario,
         usuario: req.usuario._id,
         tipoPermisos: body.tipoPermisos
     });
@@ -128,6 +131,7 @@ app.put('/:id', mdAutenticacion.verificaToken, (req, res) => {
         permiso.dias_restantes = body.dias_restantes;
         permiso.dias_adm_fijos = body.dias_adm_fijos;
         permiso.dias_adm_acumulados = body.dias_adm_acumulados;
+        permiso.funcionario = body.funcionario;
         permiso.usuario = req.usuario._id;
         permiso.tipoPermisos = body.tipoPermisos
 

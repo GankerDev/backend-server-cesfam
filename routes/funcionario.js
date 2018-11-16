@@ -20,9 +20,6 @@ app.get('/', (req, res, next) => {
         .limit(5)
         .populate('usuario', 'nombre email')
         .populate('categoria_funcionario')
-        .populate('licencia_medica')
-        .populate('feriadoLegal')
-        .populate('permiso')
         .populate('capacitacion')
         .exec(
             (err, funcionarios) => {
@@ -52,9 +49,6 @@ app.get('/:id', (req, res) => {
     Funcionario.findById(id)
         .populate('usuario', 'nombre email')
         .populate('categoria_funcionario')
-        .populate('licencia_medica')
-        .populate('feriadoLegal')
-        .populate('permiso')
         .populate('capacitacion')
         .exec((err, funcionario) => {
             if (err){
@@ -99,9 +93,6 @@ app.post('/', mdAutenticacion.verificaToken, (req, res) => {
         nivel_actual: body.nivel_actual,
         tipo_contrato: body.tipo_contrato,
         categoria_funcionario: body.categoria_funcionario,
-        licencia_medica: body.licencia_medica,
-        feriadoLegal: body.feriadoLegal,
-        permiso: body.permiso,
         capacitacion: body.capacitacion,
         usuario: req.usuario._id
     });
@@ -154,9 +145,6 @@ app.put('/:id', mdAutenticacion.verificaToken, (req, res) => {
         funcionario.nivel_actual = body.nivel_actual;
         funcionario.tipo_contrato = body.tipo_contrato;
         funcionario.categoria_funcionario = body.categoria_funcionario;
-        funcionario.licencia_medica = body.licencia_medica;
-        funcionario.feriadoLegal = body.feriadoLegal;
-        funcionario.permiso = body.permiso;
         funcionario.capacitacion = body.capacitacion;
         funcionario.usuario = req.usuario._id;
 

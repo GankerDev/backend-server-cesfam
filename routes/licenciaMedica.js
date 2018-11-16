@@ -19,6 +19,7 @@ app.get('/', (req, res, next) => {
         .skip(desde)
         .limit(5)
         .populate('usuario', 'nombre email')
+        .populate( 'funcionario' )
         .exec(
             (err, licenciasMedicas) => {
                 if (err) {
@@ -47,6 +48,7 @@ app.get('/:id', (req, res) => {
     var id = req.params.id;
     LicenciaMedica.findById(id)
         .populate('usuario', 'nombre img email')
+        .populate( 'funcionario' )
         .exec((err, licenciaMedica) => {
             if (err){
                 return res.status(500).json({
@@ -87,6 +89,7 @@ app.post('/', mdAutenticacion.verificaToken, (req, res) => {
         renta2: body.renta2,
         renta3: body.renta3,
         promedio: body.promedio,
+        funcionario: body.funcionario,
         usuario: req.usuario._id
     });
 
@@ -94,7 +97,7 @@ app.post('/', mdAutenticacion.verificaToken, (req, res) => {
         if (err) {
             return res.status(400).json({
                 ok: false,
-                mensaje: 'Error al crear licenciaMedica',
+                mensaje: 'Error al crear licencia médica',
                 errors: err
             });
         }
@@ -134,6 +137,7 @@ app.put('/:id', mdAutenticacion.verificaToken, (req, res) => {
         licenciaMedica.renta2 = body.renta2;
         licenciaMedica.renta3 = body.renta3;
         licenciaMedica.usuario = req.usuario._id;
+        licenciaMedica.funcionario = body.funcionario;
 
         licenciaMedica.save((err, licenciaMedicaGuardado) => {
             if (err) {
