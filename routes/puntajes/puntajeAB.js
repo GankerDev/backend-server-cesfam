@@ -25,7 +25,7 @@ app.get('/', (req, res, next) => {
                 }
                 res.status(200).json({
                     ok: true,
-                    puntajes: puntajes
+                    puntajeAB: puntajes
                 });
 
             })
@@ -39,25 +39,25 @@ app.get('/:id', (req, res) => {
     PuntajeAB.findById(id)
         .populate('usuario', 'nombre img email')
         .exec((err, puntajeAB) => {
-            if (err){
+            if (err) {
                 return res.status(500).json({
                     ok: false,
                     mensaje: 'Error al buscar puntaje',
                     errors: err
                 });
             }
-            if(!puntajeAB){
+            if (!puntajeAB) {
                 return res.status(400).json({
                     ok: false,
-                    mensaje: 'El puntaje con el id '+ id + ' no existe',
-                    errors: {message: 'No existe un puntaje con ese ID'}
+                    mensaje: 'El puntaje con el id ' + id + ' no existe',
+                    errors: { message: 'No existe un puntaje con ese ID' }
                 });
             }
             res.status(200).json({
                 ok: true,
                 puntajeAB: puntajeAB
             });
-        })
+        });
 });
 
 // ==============================================
@@ -84,7 +84,7 @@ app.post('/', mdAutenticacion.verificaToken, (req, res) => {
         }
         res.status(201).json({
             ok: true,
-            puntaje: puntajeGuardado
+            puntajeAB: puntajeGuardado
         });
     });
 
@@ -124,7 +124,7 @@ app.put('/:id', mdAutenticacion.verificaToken, (req, res) => {
 
             res.status(200).json({
                 ok: true,
-                puntaje: puntajeGuardado
+                puntajeAB: puntajeGuardado
             });
         });
 
@@ -158,7 +158,7 @@ app.delete('/:id', mdAutenticacion.verificaToken, (req, res) => {
 
         res.status(200).json({
             ok: true,
-            puntaje: puntajeBorrado
+            puntajeAB: puntajeBorrado
         });
     });
 });

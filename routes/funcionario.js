@@ -13,14 +13,15 @@ var Funcionario = require('../models/funcionario');
 app.get('/', (req, res, next) => {
 
     var desde = req.query.desde || 0;
+    var todo = req.query.todo;
     desde = Number(desde);
 
-    Funcionario.find({})
-        .skip(desde)
-        .limit(5)
+    if (todo) {
+        Funcionario.find({})
         .populate('usuario', 'nombre email')
         .populate('categoria_funcionario')
         .populate('capacitacion')
+        .populate('tipo_contrato')
         .exec(
             (err, funcionarios) => {
                 if (err) {
@@ -39,6 +40,36 @@ app.get('/', (req, res, next) => {
                 });
 
             })
+    } else {
+        Funcionario.find({})
+        .skip(desde)
+        .limit(5)
+        .populate('usuario', 'nombre email')
+        .populate('categoria_funcionario')
+        .populate('capacitacion')
+        .populate('tipo_contrato')
+        .exec(
+            (err, funcionarios) => {
+                if (err) {
+                    return res.status(500).json({
+                        ok: false,
+                        mensaje: 'Error cargando funcionarios',
+                        errors: err
+                    });
+                }
+                Funcionario.count({}, (err, conteo) => {
+                    res.status(200).json({
+                        ok: true,
+                        funcionarios: funcionarios,
+                        total: conteo
+                    });
+                });
+
+            })
+    }
+
+
+    
 });
 
 // ==============================================

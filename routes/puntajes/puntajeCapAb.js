@@ -25,10 +25,10 @@ app.get('/', (req, res, next) => {
                 }
                 res.status(200).json({
                     ok: true,
-                    Puntajes: Puntajes
+                    puntajeCapAB: Puntajes
                 });
 
-            })
+            });
 });
 
 // ==============================================
@@ -125,7 +125,7 @@ app.put('/:id', mdAutenticacion.verificaToken, (req, res) => {
 
             res.status(200).json({
                 ok: true,
-                puntaje: puntajeGuardado
+                puntajeCapAB: puntajeGuardado
             });
         });
 
@@ -159,7 +159,7 @@ app.delete('/:id', mdAutenticacion.verificaToken, (req, res) => {
 
         res.status(200).json({
             ok: true,
-            puntaje: puntajeBorrado
+            puntajeCapAB: puntajeBorrado
         });
     });
 });

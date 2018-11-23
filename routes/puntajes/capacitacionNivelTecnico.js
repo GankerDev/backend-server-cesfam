@@ -67,13 +67,13 @@ app.post('/', mdAutenticacion.verificaToken, (req, res) => {
 
     var body = req.body;
 
-    var CapacitacionNT = new CapacitacionNT({
+    var capacitacionNT = new CapacitacionNT({
         nivel_tecnico: body.nivel_tecnico,
         factor: body.factor,
         usuario: req.usuario._id
     });
 
-    CapacitacionNT.save((err, capacitacionNTGuardado) => {
+    capacitacionNT.save((err, capacitacionNTGuardado) => {
         if (err) {
             return res.status(400).json({
                 ok: false,
@@ -83,8 +83,7 @@ app.post('/', mdAutenticacion.verificaToken, (req, res) => {
         }
         res.status(201).json({
             ok: true,
-            CapacitacionNT: capacitacionNTGuardado,
-            usuario: req.usuario._id
+            capacitacionNT: capacitacionNTGuardado
         });
     });
 
@@ -123,8 +122,7 @@ app.put('/:id', mdAutenticacion.verificaToken, (req, res) => {
 
             res.status(200).json({
                 ok: true,
-                capacitacionNT: capacitacionNTGuardado,
-                usuario
+                capacitacionNT: capacitacionNTGuardado
             });
         });
 

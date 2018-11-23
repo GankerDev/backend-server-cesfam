@@ -25,7 +25,7 @@ app.get('/', (req, res, next) => {
                 }
                 res.status(200).json({
                     ok: true,
-                    puntajes: puntajes
+                    puntajeCapCDEF: puntajes
                 });
 
             })
@@ -84,7 +84,7 @@ app.post('/', mdAutenticacion.verificaToken, (req, res) => {
         }
         res.status(201).json({
             ok: true,
-            puntaje: puntajeGuardado,
+            puntajeCapCDEF: puntajeGuardado,
         });
     });
 
@@ -125,7 +125,7 @@ app.put('/:id', mdAutenticacion.verificaToken, (req, res) => {
 
             res.status(200).json({
                 ok: true,
-                puntaje: puntajeGuardado
+                puntajeCapCDEF: puntajeGuardado
             });
         });
 
@@ -159,7 +159,7 @@ app.delete('/:id', mdAutenticacion.verificaToken, (req, res) => {
 
         res.status(200).json({
             ok: true,
-            puntaje: puntajeBorrado
+            puntajeCapCDEF: puntajeBorrado
         });
     });
 });
