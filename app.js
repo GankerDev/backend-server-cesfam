@@ -31,6 +31,9 @@ var busquedaRoutes = require('./routes/busqueda');
 var uploadRoutes = require('./routes/upload');
 var archivosRoutes = require('./routes/archivos');
 
+// Calculo de puntajes
+var calculoPuntajeRoutes = require('./routes/calcularPuntaje');
+
 //Inicializar varriables
 var app = express();
 
@@ -69,6 +72,9 @@ app.use('/puntaje-cap-ab', puntajeCapABRoutes);
 app.use('/puntaje-cap-cdef', puntajeCapCDEFRoutes);
 app.use('/puntaje-exp', puntajeExpRoutes);
 app.use('/horas-cap', horasCapRoutes);
+
+//Calculo Puntaje
+app.use('/calcular-puntaje', calculoPuntajeRoutes);
 
 // Rutas
 app.use('/upload', uploadRoutes);

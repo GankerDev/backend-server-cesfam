@@ -19,7 +19,7 @@ app.get('/', (req, res, next) => {
         .skip(desde)
         .limit(5)
         .populate('usuario', 'nombre email')
-        .populate( 'funcionario' )
+        .populate('funcionario')
         .exec(
             (err, feriadosLegales) => {
                 if (err) {
@@ -47,20 +47,20 @@ app.get('/:id', (req, res) => {
     var id = req.params.id;
     FeriadoLegal.findById(id)
         .populate('usuario', 'nombre img email')
-        .populate( 'funcionario' )
+        .populate('funcionario')
         .exec((err, feriadoLegal) => {
-            if (err){
+            if (err) {
                 return res.status(500).json({
                     ok: false,
                     mensaje: 'Error al buscar feriado legal',
                     errors: err
                 });
             }
-            if(!feriadoLegal){
+            if (!feriadoLegal) {
                 return res.status(400).json({
                     ok: false,
-                    mensaje: 'El feriado legal con el id '+ id + ' no existe',
-                    errors: {message: 'No existe un feriado legal con ese ID'}
+                    mensaje: 'El feriado legal con el id ' + id + ' no existe',
+                    errors: { message: 'No existe un feriado legal con ese ID' }
                 });
             }
             res.status(200).json({
@@ -73,7 +73,7 @@ app.get('/:id', (req, res) => {
 // ==============================================
 //  Crear nuevo feriado legal
 // ==============================================
-app.post('/', mdAutenticacion.verificaToken, (req, res) => {
+app.post('/', [mdAutenticacion.verificaToken, mdAutenticacion.verificaAdmin], (req, res) => {
 
     var body = req.body;
 
@@ -106,7 +106,7 @@ app.post('/', mdAutenticacion.verificaToken, (req, res) => {
 // ==============================================
 //  Actualizar feriado legal
 // ==============================================
-app.put('/:id', mdAutenticacion.verificaToken, (req, res) => {
+app.put('/:id', [mdAutenticacion.verificaToken, mdAutenticacion.verificaAdmin], (req, res) => {
 
     var id = req.params.id;
     var body = req.body;
@@ -126,7 +126,7 @@ app.put('/:id', mdAutenticacion.verificaToken, (req, res) => {
             feriadoLegal.fecha_inicio_vacaciones = body.fecha_inicio_vacaciones,
             feriadoLegal.fecha_termino_vacaciones = body.fecha_termino_vacaciones,
             feriadoLegal.dias_vacaciones_restantes = body.dias_vacaciones_restantes,
-            feriadoLegal.funcionario = body.funcionario._id,
+            feriadoLegal.funcionario = body.funcionario,
             feriadoLegal.usuario = req.usuario._id
 
         feriadoLegal.save((err, feriadoLegalGuardado) => {
@@ -151,7 +151,7 @@ app.put('/:id', mdAutenticacion.verificaToken, (req, res) => {
 // ==============================================
 //  Borrar un Feriado legal por el id
 // ==============================================
-app.delete('/:id', mdAutenticacion.verificaToken, (req, res) => {
+app.delete('/:id', [mdAutenticacion.verificaToken, mdAutenticacion.verificaAdmin], (req, res) => {
     var id = req.params.id;
 
     FeriadoLegal.findByIdAndRemove(id, (err, feriadoLegalBorrado) => {

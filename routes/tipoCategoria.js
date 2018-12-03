@@ -13,31 +13,56 @@ var TipoCategoria = require('../models/tipoCategoria');
 app.get('/', (req, res, next) => {
 
     var desde = req.query.desde || 0;
+    var todo = req.query.todo;
     desde = Number(desde);
 
-    TipoCategoria.find({})
-        .skip(desde)
-        .limit(5)
-        .populate('usuario', 'nombre email')
-        .exec(
-            (err, tipoCategorias) => {
-                if (err) {
-                    return res.status(500).json({
-                        ok: false,
-                        mensaje: 'Error cargando tipo de categoria',
-                        errors: err
-                    });
-                }
+    if (todo) {
+        TipoCategoria.find({})
+            .populate('usuario', 'nombre email')
+            .exec(
+                (err, tipoCategorias) => {
+                    if (err) {
+                        return res.status(500).json({
+                            ok: false,
+                            mensaje: 'Error cargando tipo de categoria',
+                            errors: err
+                        });
+                    }
 
-                TipoCategoria.count({}, (err, conteo) => {
-                    res.status(200).json({
-                        ok: true,
-                        tipoCategorias: tipoCategorias,
-                        total: conteo
+                    TipoCategoria.count({}, (err, conteo) => {
+                        res.status(200).json({
+                            ok: true,
+                            tipoCategorias: tipoCategorias,
+                            total: conteo
+                        });
                     });
+
                 });
+    } else {
+        TipoCategoria.find({})
+            .skip(desde)
+            .limit(5)
+            .populate('usuario', 'nombre email')
+            .exec(
+                (err, tipoCategorias) => {
+                    if (err) {
+                        return res.status(500).json({
+                            ok: false,
+                            mensaje: 'Error cargando tipo de categoria',
+                            errors: err
+                        });
+                    }
 
-            });
+                    TipoCategoria.count({}, (err, conteo) => {
+                        res.status(200).json({
+                            ok: true,
+                            tipoCategorias: tipoCategorias,
+                            total: conteo
+                        });
+                    });
+
+                });
+    }
 });
 
 // ==============================================
@@ -48,18 +73,18 @@ app.get('/:id', (req, res) => {
     TipoCategoria.findById(id)
         .populate('usuario', 'nombre img email')
         .exec((err, tipoCategoria) => {
-            if (err){
+            if (err) {
                 return res.status(500).json({
                     ok: false,
                     mensaje: 'Error al buscar tipo categoria',
                     errors: err
                 });
             }
-            if(!tipoCategoria){
+            if (!tipoCategoria) {
                 return res.status(400).json({
                     ok: false,
-                    mensaje: 'El tipo categoria con el id '+ id + ' no existe',
-                    errors: {message: 'No existe un tipo categoria con ese ID'}
+                    mensaje: 'El tipo categoria con el id ' + id + ' no existe',
+                    errors: { message: 'No existe un tipo categoria con ese ID' }
                 });
             }
             res.status(200).json({
@@ -72,7 +97,7 @@ app.get('/:id', (req, res) => {
 // ==============================================
 //  Crear nuevo tipo de categoria
 // ==============================================
-app.post('/', mdAutenticacion.verificaToken, (req, res) => {
+app.post('/', [mdAutenticacion.verificaToken, mdAutenticacion.verificaAdmin], (req, res) => {
 
     var body = req.body;
 
@@ -99,7 +124,7 @@ app.post('/', mdAutenticacion.verificaToken, (req, res) => {
 // ==============================================
 //  Actualizar tipo de categoria
 // ==============================================
-app.put('/:id', mdAutenticacion.verificaToken, (req, res) => {
+app.put('/:id', [mdAutenticacion.verificaToken, mdAutenticacion.verificaAdmin], (req, res) => {
 
     var id = req.params.id;
     var body = req.body;
@@ -139,7 +164,7 @@ app.put('/:id', mdAutenticacion.verificaToken, (req, res) => {
 // ==============================================
 //  Borrar un tipo de categoria por el id
 // ==============================================
-app.delete('/:id', mdAutenticacion.verificaToken, (req, res) => {
+app.delete('/:id', [mdAutenticacion.verificaToken, mdAutenticacion.verificaAdmin], (req, res) => {
 
     var id = req.params.id;
 

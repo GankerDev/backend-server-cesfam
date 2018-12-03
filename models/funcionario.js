@@ -18,7 +18,8 @@ var funcionarioSchema = new Schema({
     img: { type: String, required: false },
 
     categoria_funcionario: { type: Schema.Types.ObjectId, ref: 'categoria', required: [true, 'El id categoria es un campo obligatorio'] },
-    capacitacion: { type: Schema.Types.ObjectId, ref: 'capacitacion' },
+    capacitacion: [{ type: Schema.Types.ObjectId, ref: 'capacitacion' }],
+
     tipo_contrato: { type: Schema.Types.ObjectId, ref: 'tipoContrato', required: [true, 'El id tipo contrato es un campo obligatorio'] },
     usuario: { type: Schema.Types.ObjectId, ref: 'Usuario' }
 }, { collection: 'funcionario' });

@@ -13,30 +13,56 @@ var Capacitacion = require('../models/capacitacion');
 app.get('/', (req, res, next) => {
 
     var desde = req.query.desde || 0;
+    var todo = req.query.todo;
     desde = Number(desde);
 
-    Capacitacion.find({})
-        .skip(desde)
-        .limit(5)
-        .populate('usuario', 'nombre email')
-        .exec(
-            (err, Capacitaciones) => {
-                if (err) {
-                    return res.status(500).json({
-                        ok: false,
-                        mensaje: 'Error cargando capacitacion',
-                        errors: err
+    if (todo) {
+        Capacitacion.find({})
+            .populate('usuario', 'nombre email')
+            .populate('cap_nivel_tecnico')
+            .exec(
+                (err, Capacitaciones) => {
+                    if (err) {
+                        return res.status(500).json({
+                            ok: false,
+                            mensaje: 'Error cargando capacitacion',
+                            errors: err
+                        });
+                    }
+                    Capacitacion.count({}, (err, conteo) => {
+                        res.status(200).json({
+                            ok: true,
+                            Capacitaciones: Capacitaciones,
+                            total: conteo
+                        });
                     });
-                }
-                Capacitacion.count({}, (err, conteo) => {
-                    res.status(200).json({
-                        ok: true,
-                        Capacitaciones: Capacitaciones,
-                        total: conteo
-                    });
-                });
 
-            })
+                })
+    } else {
+        Capacitacion.find({})
+            .skip(desde)
+            .limit(5)
+            .populate('usuario', 'nombre email')
+            .populate('cap_nivel_tecnico')
+            .exec(
+                (err, Capacitaciones) => {
+                    if (err) {
+                        return res.status(500).json({
+                            ok: false,
+                            mensaje: 'Error cargando capacitacion',
+                            errors: err
+                        });
+                    }
+                    Capacitacion.count({}, (err, conteo) => {
+                        res.status(200).json({
+                            ok: true,
+                            Capacitaciones: Capacitaciones,
+                            total: conteo
+                        });
+                    });
+
+                })
+    }
 });
 // ==============================================
 //  Obtener capacitación por ID
@@ -46,18 +72,18 @@ app.get('/:id', (req, res) => {
     Capacitacion.findById(id)
         .populate('usuario', 'nombre img email')
         .exec((err, capacitacion) => {
-            if (err){
+            if (err) {
                 return res.status(500).json({
                     ok: false,
                     mensaje: 'Error al buscar capacitación',
                     errors: err
                 });
             }
-            if(!capacitacion){
+            if (!capacitacion) {
                 return res.status(400).json({
                     ok: false,
-                    mensaje: 'La capacitación con el id '+ id + ' no existe',
-                    errors: {message: 'No existe una capacitación con ese ID'}
+                    mensaje: 'La capacitación con el id ' + id + ' no existe',
+                    errors: { message: 'No existe una capacitación con ese ID' }
                 });
             }
             res.status(200).json({
@@ -65,20 +91,21 @@ app.get('/:id', (req, res) => {
                 capacitacion: capacitacion
             });
         })
-
-
 })
 
 // ==============================================
 //  Crear nueva capacitacion
 // ==============================================
-app.post('/', mdAutenticacion.verificaToken, (req, res) => {
+app.post('/', [mdAutenticacion.verificaToken, mdAutenticacion.verificaAdmin], (req, res) => {
 
     var body = req.body;
 
     var capacitacion = new Capacitacion({
         nombre_capacitacion: body.nombre_capacitacion,
+        duracion: body.duracion,
+        nota: 0,
         descripcion_capacitacion: body.descripcion_capacitacion,
+        cap_nivel_tecnico: body.cap_nivel_tecnico,
         usuario: req.usuario._id
     });
 
@@ -101,7 +128,7 @@ app.post('/', mdAutenticacion.verificaToken, (req, res) => {
 // ==============================================
 //  Actualizar capacitacion
 // ==============================================
-app.put('/:id', mdAutenticacion.verificaToken, (req, res) => {
+app.put('/:id', [mdAutenticacion.verificaToken, mdAutenticacion.verificaAdmin], (req, res) => {
 
     var id = req.params.id;
     var body = req.body;
@@ -117,7 +144,10 @@ app.put('/:id', mdAutenticacion.verificaToken, (req, res) => {
         }
 
         capacitacion.nombre_capacitacion = body.nombre_capacitacion;
+        capacitacion.duracion = body.duracion;
         capacitacion.descripcion_capacitacion = body.descripcion_capacitacion;
+        capacitacion.nota = body.nota;
+        capacitacion.cap_nivel_tecnico = body.cap_nivel_tecnico;
         capacitacion.usuario = req.usuario._id;
 
         capacitacion.save((err, capacitacionGuardado) => {
@@ -142,7 +172,7 @@ app.put('/:id', mdAutenticacion.verificaToken, (req, res) => {
 // ==============================================
 //  Borrar una capacitacion por el id
 // ==============================================
-app.delete('/:id', mdAutenticacion.verificaToken, (req, res) => {
+app.delete('/:id', [mdAutenticacion.verificaToken, mdAutenticacion.verificaAdmin], (req, res) => {
 
     var id = req.params.id;
 

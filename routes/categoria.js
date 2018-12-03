@@ -13,31 +13,54 @@ var Categoria = require('../models/categoria');
 app.get('/', (req, res, next) => {
 
     var desde = req.query.desde || 0;
+    var todo = req.query.todo;
     desde = Number(desde);
 
-    Categoria.find({})
-        .skip(desde)
-        .limit(5)
-        .populate('usuario', 'nombre email')
-        .populate('tipoCategoria')
-        .exec(
-            (err, Categorias) => {
-                if (err) {
-                    return res.status(500).json({
-                        ok: false,
-                        mensaje: 'Error cargando categoria',
-                        errors: err
+    if (todo) {
+        Categoria.find({})
+            .populate('usuario', 'nombre email')
+            .populate('tipoCategoria')
+            .exec(
+                (err, Categorias) => {
+                    if (err) {
+                        return res.status(500).json({
+                            ok: false,
+                            mensaje: 'Error cargando categoria',
+                            errors: err
+                        });
+                    }
+                    Categoria.count({}, (err, conteo) => {
+                        res.status(200).json({
+                            ok: true,
+                            Categorias: Categorias,
+                            total: conteo
+                        });
                     });
-                }
-                Categoria.count({}, (err, conteo) => {
-                    res.status(200).json({
-                        ok: true,
-                        Categorias: Categorias,
-                        total: conteo
+                })
+    } else {
+        Categoria.find({})
+            .skip(desde)
+            .limit(5)
+            .populate('usuario', 'nombre email')
+            .populate('tipoCategoria')
+            .exec(
+                (err, Categorias) => {
+                    if (err) {
+                        return res.status(500).json({
+                            ok: false,
+                            mensaje: 'Error cargando categoria',
+                            errors: err
+                        });
+                    }
+                    Categoria.count({}, (err, conteo) => {
+                        res.status(200).json({
+                            ok: true,
+                            Categorias: Categorias,
+                            total: conteo
+                        });
                     });
-                });
-
-            })
+                })
+    }
 });
 
 // ==============================================
@@ -49,18 +72,18 @@ app.get('/:id', (req, res) => {
         .populate('usuario', 'nombre email img')
         .populate('tipoCategoria')
         .exec((err, categoria) => {
-            if (err){
+            if (err) {
                 return res.status(500).json({
                     ok: false,
                     mensaje: 'Error al buscar categoría',
                     errors: err
                 });
             }
-            if(!categoria){
+            if (!categoria) {
                 return res.status(400).json({
                     ok: false,
-                    mensaje: 'La categoria con el id '+ id + ' no existe',
-                    errors: {message: 'No existe una categoria con ese ID'}
+                    mensaje: 'La categoria con el id ' + id + ' no existe',
+                    errors: { message: 'No existe una categoria con ese ID' }
                 });
             }
             res.status(200).json({
@@ -73,7 +96,7 @@ app.get('/:id', (req, res) => {
 // ==============================================
 //  Crear nueva categoria
 // ==============================================
-app.post('/', mdAutenticacion.verificaToken, (req, res) => {
+app.post('/', [mdAutenticacion.verificaToken, mdAutenticacion.verificaAdmin], (req, res) => {
 
     var body = req.body;
 
@@ -103,7 +126,7 @@ app.post('/', mdAutenticacion.verificaToken, (req, res) => {
 // ==============================================
 //  Actualizar categoria
 // ==============================================
-app.put('/:id', mdAutenticacion.verificaToken, (req, res) => {
+app.put('/:id', [mdAutenticacion.verificaToken, mdAutenticacion.verificaAdmin], (req, res) => {
 
     var id = req.params.id;
     var body = req.body;
@@ -145,7 +168,7 @@ app.put('/:id', mdAutenticacion.verificaToken, (req, res) => {
 // ==============================================
 //  Borrar una categoria por el id
 // ==============================================
-app.delete('/:id', mdAutenticacion.verificaToken, (req, res) => {
+app.delete('/:id', [mdAutenticacion.verificaToken, mdAutenticacion.verificaAdmin], (req, res) => {
 
     var id = req.params.id;
 

@@ -135,8 +135,6 @@ function subirPorTipo(tipo, id, nombreArchivo, res) {
 
             funcionario.save((err, funcionarioActualizado) => {
 
-                funcionarioActualizado.password = ':)';
-
                 return res.status(200).json({
                     ok: true,
                     mensaje: 'Imagen de funcionario actualizada',

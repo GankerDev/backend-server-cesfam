@@ -13,30 +13,54 @@ var TipoPermiso = require('../models/tipoPermisos');
 app.get('/', (req, res, next) => {
 
     var desde = req.query.desde || 0;
+    var todo = req.query.todo;
     desde = Number(desde);
 
-    TipoPermiso.find({})
-        .skip(desde)
-        .limit(5)
-        .populate('usuario', 'nombre email')
-        .exec(
-            (err, tipoPermisos) => {
-                if (err) {
-                    return res.status(500).json({
-                        ok: false,
-                        mensaje: 'Error cargando tipo de permiso',
-                        errors: err
-                    });
-                }
+    if (todo) {
+        TipoPermiso.find({})
+            .populate('usuario', 'nombre email')
+            .exec(
+                (err, tipoPermisos) => {
+                    if (err) {
+                        return res.status(500).json({
+                            ok: false,
+                            mensaje: 'Error cargando tipo de permiso',
+                            errors: err
+                        });
+                    }
 
-                TipoPermiso.count({}, (err, conteo) => {
-                    res.status(200).json({
-                        ok: true,
-                        tipoPermisos: tipoPermisos,
-                        total: conteo
+                    TipoPermiso.count({}, (err, conteo) => {
+                        res.status(200).json({
+                            ok: true,
+                            tipoPermisos: tipoPermisos,
+                            total: conteo
+                        });
                     });
                 });
-            });
+    } else {
+        TipoPermiso.find({})
+            .skip(desde)
+            .limit(5)
+            .populate('usuario', 'nombre email')
+            .exec(
+                (err, tipoPermisos) => {
+                    if (err) {
+                        return res.status(500).json({
+                            ok: false,
+                            mensaje: 'Error cargando tipo de permiso',
+                            errors: err
+                        });
+                    }
+
+                    TipoPermiso.count({}, (err, conteo) => {
+                        res.status(200).json({
+                            ok: true,
+                            tipoPermisos: tipoPermisos,
+                            total: conteo
+                        });
+                    });
+                });
+    }
 });
 
 // ==============================================
@@ -47,18 +71,18 @@ app.get('/:id', (req, res) => {
     TipoPermiso.findById(id)
         .populate('usuario', 'nombre img email')
         .exec((err, tipoPermiso) => {
-            if (err){
+            if (err) {
                 return res.status(500).json({
                     ok: false,
                     mensaje: 'Error al buscar tipo permiso',
                     errors: err
                 });
             }
-            if(!tipoPermiso){
+            if (!tipoPermiso) {
                 return res.status(400).json({
                     ok: false,
-                    mensaje: 'El tipo permiso con el id '+ id + ' no existe',
-                    errors: {message: 'No existe un tipo permiso con ese ID'}
+                    mensaje: 'El tipo permiso con el id ' + id + ' no existe',
+                    errors: { message: 'No existe un tipo permiso con ese ID' }
                 });
             }
             res.status(200).json({
@@ -72,7 +96,7 @@ app.get('/:id', (req, res) => {
 // ==============================================
 //  Crear nuevo tipo de permiso
 // ==============================================
-app.post('/', mdAutenticacion.verificaToken, (req, res) => {
+app.post('/', [mdAutenticacion.verificaToken, mdAutenticacion.verificaAdmin], (req, res) => {
 
     var body = req.body;
 
@@ -100,7 +124,7 @@ app.post('/', mdAutenticacion.verificaToken, (req, res) => {
 // ==============================================
 //  Actualizar tipo de permiso
 // ==============================================
-app.put('/:id', mdAutenticacion.verificaToken, (req, res) => {
+app.put('/:id', [mdAutenticacion.verificaToken, mdAutenticacion.verificaAdmin], (req, res) => {
 
     var id = req.params.id;
     var body = req.body;
@@ -140,7 +164,7 @@ app.put('/:id', mdAutenticacion.verificaToken, (req, res) => {
 // ==============================================
 //  Borrar un tipo de permiso por el id
 // ==============================================
-app.delete('/:id', mdAutenticacion.verificaToken, (req, res) => {
+app.delete('/:id', [mdAutenticacion.verificaToken, mdAutenticacion.verificaAdmin], (req, res) => {
     var id = req.params.id;
 
     TipoPermiso.findByIdAndRemove(id, (err, tipoPermisoBorrado) => {

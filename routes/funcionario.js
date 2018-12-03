@@ -3,6 +3,7 @@ var express = require('express');
 var mdAutenticacion = require('../middlewares/autenticacion');
 
 var app = express();
+var mongoose = require('mongoose');
 
 var Funcionario = require('../models/funcionario');
 
@@ -18,58 +19,54 @@ app.get('/', (req, res, next) => {
 
     if (todo) {
         Funcionario.find({})
-        .populate('usuario', 'nombre email')
-        .populate('categoria_funcionario')
-        .populate('capacitacion')
-        .populate('tipo_contrato')
-        .exec(
-            (err, funcionarios) => {
-                if (err) {
-                    return res.status(500).json({
-                        ok: false,
-                        mensaje: 'Error cargando funcionarios',
-                        errors: err
+            .populate('usuario', 'nombre email')
+            .populate('categoria_funcionario')
+            .populate('capacitacion')
+            .populate('tipo_contrato')
+            .exec(
+                (err, funcionarios) => {
+                    if (err) {
+                        return res.status(500).json({
+                            ok: false,
+                            mensaje: 'Error cargando funcionarios',
+                            errors: err
+                        });
+                    }
+                    Funcionario.count({}, (err, conteo) => {
+                        res.status(200).json({
+                            ok: true,
+                            funcionarios: funcionarios,
+                            total: conteo
+                        });
                     });
-                }
-                Funcionario.count({}, (err, conteo) => {
-                    res.status(200).json({
-                        ok: true,
-                        funcionarios: funcionarios,
-                        total: conteo
-                    });
-                });
 
-            })
+                })
     } else {
         Funcionario.find({})
-        .skip(desde)
-        .limit(5)
-        .populate('usuario', 'nombre email')
-        .populate('categoria_funcionario')
-        .populate('capacitacion')
-        .populate('tipo_contrato')
-        .exec(
-            (err, funcionarios) => {
-                if (err) {
-                    return res.status(500).json({
-                        ok: false,
-                        mensaje: 'Error cargando funcionarios',
-                        errors: err
+            .skip(desde)
+            .limit(5)
+            .populate('usuario', 'nombre email')
+            .populate('categoria_funcionario')
+            .populate('capacitacion')
+            .populate('tipo_contrato')
+            .exec(
+                (err, funcionarios) => {
+                    if (err) {
+                        return res.status(500).json({
+                            ok: false,
+                            mensaje: 'Error cargando funcionarios',
+                            errors: err
+                        });
+                    }
+                    Funcionario.count({}, (err, conteo) => {
+                        res.status(200).json({
+                            ok: true,
+                            funcionarios: funcionarios,
+                            total: conteo
+                        });
                     });
-                }
-                Funcionario.count({}, (err, conteo) => {
-                    res.status(200).json({
-                        ok: true,
-                        funcionarios: funcionarios,
-                        total: conteo
-                    });
-                });
-
-            })
+                })
     }
-
-
-    
 });
 
 // ==============================================
@@ -81,19 +78,20 @@ app.get('/:id', (req, res) => {
         .populate('usuario', 'nombre email')
         .populate('categoria_funcionario')
         .populate('capacitacion')
+        .populate('capacitacionNivelTecnico')
         .exec((err, funcionario) => {
-            if (err){
+            if (err) {
                 return res.status(500).json({
                     ok: false,
                     mensaje: 'Error al buscar funcionario',
                     errors: err
                 });
             }
-            if(!funcionario){
+            if (!funcionario) {
                 return res.status(400).json({
                     ok: false,
-                    mensaje: 'El funcionario con el id '+ id + ' no existe',
-                    errors: {message: 'No existe un funcionario con ese ID'}
+                    mensaje: 'El funcionario con el id ' + id + ' no existe',
+                    errors: { message: 'No existe un funcionario con ese ID' }
                 });
             }
             res.status(200).json({
@@ -106,7 +104,7 @@ app.get('/:id', (req, res) => {
 // ==============================================
 //  Crear nuevo funcionario
 // ==============================================
-app.post('/', mdAutenticacion.verificaToken, (req, res) => {
+app.post('/', [mdAutenticacion.verificaToken, mdAutenticacion.verificaAdmin], (req, res) => {
 
     var body = req.body;
 
@@ -148,10 +146,10 @@ app.post('/', mdAutenticacion.verificaToken, (req, res) => {
 // ==============================================
 //  Actualizar funcionario
 // ==============================================
-app.put('/:id', mdAutenticacion.verificaToken, (req, res) => {
-
+app.put('/:id', [mdAutenticacion.verificaToken, mdAutenticacion.verificaAdmin], (req, res) => {
     var id = req.params.id;
     var body = req.body;
+    console.log('cap: ', body.capacitacion);
 
     Funcionario.findById(id, (err, funcionario) => {
 
@@ -176,7 +174,6 @@ app.put('/:id', mdAutenticacion.verificaToken, (req, res) => {
         funcionario.nivel_actual = body.nivel_actual;
         funcionario.tipo_contrato = body.tipo_contrato;
         funcionario.categoria_funcionario = body.categoria_funcionario;
-        funcionario.capacitacion = body.capacitacion;
         funcionario.usuario = req.usuario._id;
 
         funcionario.save((err, funcionarioGuardado) => {
@@ -193,15 +190,64 @@ app.put('/:id', mdAutenticacion.verificaToken, (req, res) => {
                 funcionario: funcionarioGuardado,
             });
         });
-
     });
+});
 
+// ==============================================
+//  Agregar capacitacion a funcionario
+// ==============================================
+app.put('/:id/:nota', [mdAutenticacion.verificaToken, mdAutenticacion.verificaAdmin], (req, res) => {
+    var id = req.params.id;
+    var body = req.body;
+    var nota = req.params.nota;
+
+    Funcionario.findById(id, (err, funcionario) => {
+
+        if (err) {
+            return res.status(400).json({
+                ok: false,
+                mensaje: 'El funcionario con el id ' + id + ' no existe',
+                errors: { message: 'No existe un funcionario con ese ID' }
+            });
+        }
+
+        funcionario.nombre = body.nombre;
+        funcionario.rut = body.rut;
+        funcionario.fecha_nacimiento = body.fecha_nacimiento;
+        funcionario.direccion = body.direccion;
+        funcionario.email = body.email;
+        funcionario.telefono = body.telefono;
+        funcionario.fecha_inicio_laboral = body.fecha_inicio_laboral;
+        funcionario.fecha_cumple_bienio = body.fecha_cumple_bienio;
+        funcionario.puntaje_cap_acumulado = body.puntaje_cap_acumulado;
+        funcionario.total_puntaje = body.total_puntaje;
+        funcionario.nivel_actual = body.nivel_actual;
+        funcionario.tipo_contrato = body.tipo_contrato;
+        funcionario.capacitacion.push(body.capacitacion);
+        funcionario.categoria_funcionario = body.categoria_funcionario;
+        funcionario.usuario = req.usuario._id;
+
+        funcionario.save((err, funcionarioGuardado) => {
+            if (err) {
+                return res.status(500).json({
+                    ok: false,
+                    mensaje: 'Error al actualizar el funcionario',
+                    errors: err
+                });
+            }
+
+            res.status(200).json({
+                ok: true,
+                funcionario: funcionarioGuardado,
+            });
+        });
+    });
 });
 
 // ==============================================
 //  Borrar un Feriado legal por el id
 // ==============================================
-app.delete('/:id', mdAutenticacion.verificaToken, (req, res) => {
+app.delete('/:id', [mdAutenticacion.verificaToken, mdAutenticacion.verificaAdmin], (req, res) => {
     var id = req.params.id;
 
     Funcionario.findByIdAndRemove(id, (err, funcionarioBorrado) => {

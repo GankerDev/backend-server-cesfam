@@ -20,7 +20,7 @@ app.get('/', (req, res, next) => {
         .limit(5)
         .populate('usuario', 'nombre email')
         .populate('tipoPermisos')
-        .populate( 'funcionario' )
+        .populate('funcionario')
         .exec(
             (err, permisos) => {
                 if (err) {
@@ -48,21 +48,21 @@ app.get('/:id', (req, res) => {
     var id = req.params.id;
     Permiso.findById(id)
         .populate('usuario', 'nombre img email')
-        .populate( 'funcionario' )
+        .populate('funcionario')
         .populate('tipoPermisos')
         .exec((err, permiso) => {
-            if (err){
+            if (err) {
                 return res.status(500).json({
                     ok: false,
                     mensaje: 'Error al buscar permiso',
                     errors: err
                 });
             }
-            if(!permiso){
+            if (!permiso) {
                 return res.status(400).json({
                     ok: false,
-                    mensaje: 'El permiso con el id '+ id + ' no existe',
-                    errors: {message: 'No existe un permiso con ese ID'}
+                    mensaje: 'El permiso con el id ' + id + ' no existe',
+                    errors: { message: 'No existe un permiso con ese ID' }
                 });
             }
             res.status(200).json({
@@ -75,7 +75,7 @@ app.get('/:id', (req, res) => {
 // ==============================================
 //  Crear nuevo permiso
 // ==============================================
-app.post('/', mdAutenticacion.verificaToken, (req, res) => {
+app.post('/', [mdAutenticacion.verificaToken, mdAutenticacion.verificaAdmin], (req, res) => {
 
     var body = req.body;
 
@@ -110,7 +110,7 @@ app.post('/', mdAutenticacion.verificaToken, (req, res) => {
 // ==============================================
 //  Actualizar permiso
 // ==============================================
-app.put('/:id', mdAutenticacion.verificaToken, (req, res) => {
+app.put('/:id', [mdAutenticacion.verificaToken, mdAutenticacion.verificaAdmin], (req, res) => {
 
     var id = req.params.id;
     var body = req.body;
@@ -157,7 +157,7 @@ app.put('/:id', mdAutenticacion.verificaToken, (req, res) => {
 // ==============================================
 //  Borrar un permiso por el id
 // ==============================================
-app.delete('/:id', mdAutenticacion.verificaToken, (req, res) => {
+app.delete('/:id', [mdAutenticacion.verificaToken, mdAutenticacion.verificaAdmin], (req, res) => {
     var id = req.params.id;
 
     Permiso.findByIdAndRemove(id, (err, permisoBorrado) => {

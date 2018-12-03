@@ -13,29 +13,52 @@ var TipoContrato = require('../models/tipoContrato');
 app.get('/', (req, res, next) => {
 
     var desde = req.query.desde || 0;
+    var todo = req.query.todo;
     desde = Number(desde);
 
-    TipoContrato.find({})
-        .skip(desde)
-        .limit(5)
-        .populate('usuario', 'nombre email')
-        .exec(
-            (err, tipoContratos) => {
-                if (err) {
-                    return res.status(500).json({
-                        ok: false,
-                        mensaje: 'Error cargando tipo de contrato',
-                        errors: err
-                    });
-                }
-                TipoContrato.count({}, (err, conteo) => {
-                    res.status(200).json({
-                        ok: true,
-                        tipoContratos: tipoContratos,
-                        total: conteo
+    if (todo) {
+        TipoContrato.find({})
+            .populate('usuario', 'nombre email')
+            .exec(
+                (err, tipoContratos) => {
+                    if (err) {
+                        return res.status(500).json({
+                            ok: false,
+                            mensaje: 'Error cargando tipo de contrato',
+                            errors: err
+                        });
+                    }
+                    TipoContrato.count({}, (err, conteo) => {
+                        res.status(200).json({
+                            ok: true,
+                            tipoContratos: tipoContratos,
+                            total: conteo
+                        });
                     });
                 });
-            });
+    } else {
+        TipoContrato.find({})
+            .skip(desde)
+            .limit(5)
+            .populate('usuario', 'nombre email')
+            .exec(
+                (err, tipoContratos) => {
+                    if (err) {
+                        return res.status(500).json({
+                            ok: false,
+                            mensaje: 'Error cargando tipo de contrato',
+                            errors: err
+                        });
+                    }
+                    TipoContrato.count({}, (err, conteo) => {
+                        res.status(200).json({
+                            ok: true,
+                            tipoContratos: tipoContratos,
+                            total: conteo
+                        });
+                    });
+                });
+    }
 });
 
 // ==============================================
@@ -46,18 +69,18 @@ app.get('/:id', (req, res) => {
     TipoContrato.findById(id)
         .populate('usuario', 'nombre img email')
         .exec((err, tipoContrato) => {
-            if (err){
+            if (err) {
                 return res.status(500).json({
                     ok: false,
                     mensaje: 'Error al buscar tipo contrato',
                     errors: err
                 });
             }
-            if(!tipoContrato){
+            if (!tipoContrato) {
                 return res.status(400).json({
                     ok: false,
-                    mensaje: 'El tipo contrato con el id '+ id + ' no existe',
-                    errors: {message: 'No existe un tipo contrato con ese ID'}
+                    mensaje: 'El tipo contrato con el id ' + id + ' no existe',
+                    errors: { message: 'No existe un tipo contrato con ese ID' }
                 });
             }
             res.status(200).json({
@@ -70,7 +93,7 @@ app.get('/:id', (req, res) => {
 // ==============================================
 //  Crear nuevo tipo de contrato
 // ==============================================
-app.post('/', mdAutenticacion.verificaToken, (req, res) => {
+app.post('/', [mdAutenticacion.verificaToken, mdAutenticacion.verificaAdmin], (req, res) => {
 
     var body = req.body;
 
@@ -99,7 +122,7 @@ app.post('/', mdAutenticacion.verificaToken, (req, res) => {
 // ==============================================
 //  Actualizar tipo de contrato
 // ==============================================
-app.put('/:id', mdAutenticacion.verificaToken, (req, res) => {
+app.put('/:id', [mdAutenticacion.verificaToken, mdAutenticacion.verificaAdmin], (req, res) => {
 
     var id = req.params.id;
     var body = req.body;
@@ -140,7 +163,7 @@ app.put('/:id', mdAutenticacion.verificaToken, (req, res) => {
 // ==============================================
 //  Borrar un tipo de contrato por el id
 // ==============================================
-app.delete('/:id', mdAutenticacion.verificaToken, (req, res) => {
+app.delete('/:id', [mdAutenticacion.verificaToken, mdAutenticacion.verificaAdmin], (req, res) => {
 
     var id = req.params.id;
 

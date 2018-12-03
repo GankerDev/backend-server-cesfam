@@ -19,7 +19,7 @@ app.get('/', (req, res, next) => {
         .skip(desde)
         .limit(5)
         .populate('usuario', 'nombre email')
-        .populate( 'funcionario' )
+        .populate('funcionario')
         .exec(
             (err, licenciasMedicas) => {
                 if (err) {
@@ -48,20 +48,20 @@ app.get('/:id', (req, res) => {
     var id = req.params.id;
     LicenciaMedica.findById(id)
         .populate('usuario', 'nombre img email')
-        .populate( 'funcionario' )
+        .populate('funcionario')
         .exec((err, licenciaMedica) => {
-            if (err){
+            if (err) {
                 return res.status(500).json({
                     ok: false,
                     mensaje: 'Error al buscar licencia medica',
                     errors: err
                 });
             }
-            if(!licenciaMedica){
+            if (!licenciaMedica) {
                 return res.status(400).json({
                     ok: false,
-                    mensaje: 'La licencia medica con el id '+ id + ' no existe',
-                    errors: {message: 'No existe una licencia médica con ese ID'}
+                    mensaje: 'La licencia medica con el id ' + id + ' no existe',
+                    errors: { message: 'No existe una licencia médica con ese ID' }
                 });
             }
             res.status(200).json({
@@ -74,7 +74,7 @@ app.get('/:id', (req, res) => {
 // ==============================================
 //  Crear nueva licencia medica
 // ==============================================
-app.post('/', mdAutenticacion.verificaToken, (req, res) => {
+app.post('/', [mdAutenticacion.verificaToken, mdAutenticacion.verificaAdmin], (req, res) => {
 
     var body = req.body;
 
@@ -112,7 +112,7 @@ app.post('/', mdAutenticacion.verificaToken, (req, res) => {
 // ==============================================
 //  Actualizar licencia medica
 // ==============================================
-app.put('/:id', mdAutenticacion.verificaToken, (req, res) => {
+app.put('/:id', [mdAutenticacion.verificaToken, mdAutenticacion.verificaAdmin], (req, res) => {
 
     var id = req.params.id;
     var body = req.body;
@@ -161,7 +161,7 @@ app.put('/:id', mdAutenticacion.verificaToken, (req, res) => {
 // ==============================================
 //  Borrar un licenciaMedica por el id
 // ==============================================
-app.delete('/:id', mdAutenticacion.verificaToken, (req, res) => {
+app.delete('/:id', [mdAutenticacion.verificaToken, mdAutenticacion.verificaAdmin], (req, res) => {
     var id = req.params.id;
 
     LicenciaMedica.findByIdAndRemove(id, (err, licenciaMedicaBorrado) => {

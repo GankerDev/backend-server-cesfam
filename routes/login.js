@@ -39,7 +39,6 @@ async function verify(token) {
 app.post('/google', async(req, res) => {
 
     var token = req.body.token;
-    console.log(token);
 
     var googleUser = await verify(token)
         .catch(e => {
@@ -71,7 +70,8 @@ app.post('/google', async(req, res) => {
                     ok: true,
                     usuario: usuarioDB,
                     token: token,
-                    id: usuarioDB.id
+                    id: usuarioDB.id,
+                    menu: obtenerMenu(usuario.role)
                 });
             }
         } else {
@@ -91,17 +91,13 @@ app.post('/google', async(req, res) => {
                     ok: true,
                     usuario: usuarioDB,
                     token: token,
-                    id: usuarioDB.id
+                    id: usuarioDB.id,
+                    menu: obtenerMenu(usuarioDB.role)
                 });
             });
         }
     });
 
-    // return res.status(200).json({
-    //     ok: true,
-    //     mensaje: 'OK!!',
-    //     googleUser: googleUser
-    // });
 });
 
 // ===================================================================
@@ -125,7 +121,7 @@ app.post('/', (req, res) => {
         if (!usuarioDB) {
             return res.status(400).json({
                 ok: false,
-                mensaje: 'Credenciales incorrectas - email',
+                mensaje: 'Credenciales incorrectas',
                 errors: err
             });
         }
@@ -133,7 +129,7 @@ app.post('/', (req, res) => {
         if (!bcrypt.compareSync(body.password, usuarioDB.password)) {
             return res.status(400).json({
                 ok: false,
-                mensaje: 'Credenciales incorrectas - password',
+                mensaje: 'Credenciales incorrectas',
                 errors: err
             });
         }
@@ -146,10 +142,72 @@ app.post('/', (req, res) => {
             ok: true,
             usuario: usuarioDB,
             token: token,
-            id: usuarioDB.id
+            id: usuarioDB.id,
+            menu: obtenerMenu(usuarioDB.role)
         });
     });
 });
+
+function obtenerMenu(role) {
+
+    var menu = [ //{
+        //         titulo: 'Principal',
+        //         icono: 'mdi mdi-gauge',
+        //         submenu: [
+        //             { titulo: 'Dashboard', url: '/dashboard' },
+        //             { titulo: 'ProgressBar', url: '/progress' },
+        //             { titulo: 'Gráficas', url: '/graficas1' },
+        //             { titulo: 'Ajustes de tema', url: '/account-settings' },
+        //             { titulo: 'Promesas', url: '/promesas' },
+        //             { titulo: 'Rxjs', url: '/rxjs' }
+        //         ]
+        //     },
+        {
+            titulo: 'Mantenimiento',
+            icono: 'mdi mdi-folder-lock-open',
+            submenu: [
+                //{ titulo: 'Usuarios', url: '/usuarios' },
+                { titulo: 'Capacitación', url: '/capacitaciones' },
+                { titulo: 'Categoría', url: '/categorias' },
+                { titulo: 'Feriado legal', url: '/feriado-legal' },
+                { titulo: 'Funcionarios', url: '/funcionarios' },
+                { titulo: 'Licencias medicas', url: '/licencia-medica' },
+                { titulo: 'Permisos', url: '/permisos' },
+                { titulo: 'Tipo Categoría', url: '/tipo-categoria' },
+                { titulo: 'Tipo Contrato', url: '/tipo-contrato' },
+                { titulo: 'Tipo Permiso', url: '/tipo-permiso' }
+            ]
+        },
+        {
+            titulo: 'Puntajes',
+            icono: 'mdi mdi-settings',
+            submenu: [
+                { titulo: 'Capacitación nivel técnico', url: '/cap-nivel-tecnicos' },
+                { titulo: 'Nota Capacitación', url: '/cap-notas' },
+                { titulo: 'Duración capacitación', url: '/horas-caps' },
+                { titulo: 'Puntaje A-B', url: '/puntajeAbs' },
+                { titulo: 'Puntaje C-D-E-F', url: '/puntajeCDEFs' },
+                { titulo: 'Puntaje capacitación A-B', url: '/puntaje-cap-abs' },
+                { titulo: 'Puntaje capacitación C-D-E-F', url: '/puntaje-cap-cdefs' },
+                { titulo: 'Puntaje experiencia', url: '/puntaje-exps' }
+            ]
+        },
+        {
+            titulo: 'Reportes',
+            icono: 'fa fa-archive',
+            submenu: [
+                { titulo: 'Permisos', url: '/reporte-permisos' },
+                { titulo: 'Capacitaciones por funcionario', url: '/reporte-capacitaciones' }
+            ]
+        }
+    ];
+
+    if (role === 'ADMIN_ROLE') {
+        menu[0].submenu.unshift({ titulo: 'Usuarios', url: '/usuarios' });
+    }
+
+    return menu;
+}
 
 
 module.exports = app;
