@@ -149,7 +149,6 @@ app.post('/', [mdAutenticacion.verificaToken, mdAutenticacion.verificaAdmin], (r
 app.put('/:id', [mdAutenticacion.verificaToken, mdAutenticacion.verificaAdmin], (req, res) => {
     var id = req.params.id;
     var body = req.body;
-    console.log('cap: ', body.capacitacion);
 
     Funcionario.findById(id, (err, funcionario) => {
 
@@ -223,7 +222,24 @@ app.put('/:id/:nota', [mdAutenticacion.verificaToken, mdAutenticacion.verificaAd
         funcionario.total_puntaje = body.total_puntaje;
         funcionario.nivel_actual = body.nivel_actual;
         funcionario.tipo_contrato = body.tipo_contrato;
-        funcionario.capacitacion.push(body.capacitacion);
+        console.log('array', funcionario.capacitacion)
+        console.log('body', body.capacitacion)
+        console.log(funcionario.capacitacion.includes( '"5c05dc41bd16ae2341450691"' ))
+        if (funcionario.capacitacion.lenght === 0){
+            console.log('hola');
+            funcionario.capacitacion = body.capacitacion._id;
+        } else {
+            if( funcionario.capacitacion.includes( body.capacitacion ) ) {
+               return res.status(500).json({
+                    ok: false,
+                    mensaje: 'Error al actualizar el funcionario',
+                    errors: err
+                }); 
+            }else {
+            funcionario.capacitacion.push(body.capacitacion);
+            }
+        }
+        
         funcionario.categoria_funcionario = body.categoria_funcionario;
         funcionario.usuario = req.usuario._id;
 

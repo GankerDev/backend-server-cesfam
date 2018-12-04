@@ -5,6 +5,7 @@ var app = express();
 var DuracionCAP = require('../models/puntajes/horasCapacitacion');
 var NotaCapacitacion = require('../models/puntajes/capacitacionNota')
 var CapNT = require('../models/puntajes/capacitacionNivelTecnico');
+var PuntajeExperiencia = require('../models/puntajes/puntajeExp')
 // ==============================================
 //  Obtener Puntaje duración Capacitación
 // ==============================================
@@ -59,6 +60,17 @@ app.get('/nivel-tecnico/:nivel', (req, res) => {
                 }
             }
         })
+})
+
+app.get('/puntaje-exp/:bienio', (req, res) => {
+    var bienio = req.params.bienio;
+    
+    PuntajeExperiencia.findOne({'bienio': bienio}, function(err, doc){
+        return res.status(200).json({
+                        ok: true,
+                        puntaje: doc
+                    });
+    });  
 })
 
 module.exports = app;
