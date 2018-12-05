@@ -14,15 +14,14 @@ app.get('/', (req, res, next) => {
 
 Funcionario.find()
     .exec((err, funcionarios) => {
-            for (let i = 0; i < funcionarios.length; i++) {
-                Capacitacion.find()
-                    .exec((err, capacitaciones) => {
-                            if (funcionarios[i].capacitacion.nombre_capacitacion === capacitaciones.nombre_capacitacion) {
-                                contador++;
-                            }
-                        }
-                    };
-            }
+        for (let i = 0; i < funcionarios.length; i++) {
+            Capacitacion.find()
+                .exec((err, capacitaciones) => {
+                    if (funcionarios[i].capacitacion.nombre_capacitacion === capacitaciones.nombre_capacitacion) {
+                        contador++;
+                    }
+                })
+        }
+    });
 
-
-            module.exports = app;
+module.exports = app;

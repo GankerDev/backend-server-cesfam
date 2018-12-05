@@ -8,7 +8,7 @@ var permisoSchema = new Schema({
     dias_fijos: { type: Number, required: true },
     tiempo_permiso: { type: Number, required: true },
     dias_restantes: { type: Number },
-    dias_adm_fijos: { type: Number, required: true },
+    dias_adm_fijos: { type: Number },
     dias_adm_acumulados: { type: Number },
     funcionario: { type: Schema.Types.ObjectId, ref: 'funcionario' },
     usuario: { type: Schema.Types.ObjectId, ref: 'Usuario' },

@@ -5,7 +5,10 @@ var app = express();
 var DuracionCAP = require('../models/puntajes/horasCapacitacion');
 var NotaCapacitacion = require('../models/puntajes/capacitacionNota')
 var CapNT = require('../models/puntajes/capacitacionNivelTecnico');
-var PuntajeExperiencia = require('../models/puntajes/puntajeExp')
+var PuntajeExperiencia = require('../models/puntajes/puntajeExp');
+var PuntajeAB = require('../models/puntajes/puntajeAB');
+var PuntajeCDEF = require('../models/puntajes/puntajeCDEF');
+
 // ==============================================
 //  Obtener Puntaje duración Capacitación
 // ==============================================
@@ -64,13 +67,57 @@ app.get('/nivel-tecnico/:nivel', (req, res) => {
 
 app.get('/puntaje-exp/:bienio', (req, res) => {
     var bienio = req.params.bienio;
-    
-    PuntajeExperiencia.findOne({'bienio': bienio}, function(err, doc){
+
+    PuntajeExperiencia.findOne({ 'bienio': bienio }, function(err, doc) {
         return res.status(200).json({
+            ok: true,
+            puntaje: doc
+        });
+    });
+})
+
+app.get('/puntajeA-B/:puntaje', (req, res) => {
+    var puntaje = req.params.puntaje;
+
+    PuntajeAB.find()
+        .exec((err, obj) => {
+            for (let i = 0; i < obj.length; i++) {
+                if (puntaje > 16000) {
+                    return res.status(200).json({
                         ok: true,
-                        puntaje: doc
+                        obj: 16000
                     });
-    });  
+                }
+                if (puntaje <= obj[i].rango_max && puntaje >= obj[i].rango_min) {
+                    return res.status(200).json({
+                        ok: true,
+                        obj: obj[i].nivel
+                    });
+                }
+            }
+        })
+})
+
+app.get('/puntajeCDEF/:puntaje', (req, res) => {
+    var puntaje = req.params.puntaje;
+
+    PuntajeCDEF.find()
+        .exec((err, obj) => {
+            for (let i = 0; i < obj.length; i++) {
+                if (puntaje > 15000) {
+                    return res.status(200).json({
+                        ok: true,
+                        obj: 15000
+                    });
+                }
+                if (puntaje <= obj[i].rango_max && puntaje >= obj[i].rango_min) {
+                    return res.status(200).json({
+                        ok: true,
+                        obj: obj[i].nivel
+                    });
+                }
+            }
+        })
 })
 
 module.exports = app;
